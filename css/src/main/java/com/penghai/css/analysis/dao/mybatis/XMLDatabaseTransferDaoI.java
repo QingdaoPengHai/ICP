@@ -1,4 +1,4 @@
-package com.penghai.css.management.dao.mybatis;
+package com.penghai.css.analysis.dao.mybatis;
 
 import java.util.LinkedHashMap;
 import java.util.List;

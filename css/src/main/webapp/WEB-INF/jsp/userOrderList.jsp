@@ -10,16 +10,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>个人中心</title>
-<link rel="stylesheet" type="text/css" href="<%=apath%>/resources/css/style.css"/>
-<link rel="stylesheet" type="text/css" href="<%=apath%>/resources/css/orderList.css"/>
+<link href="<%=apath%>/resources/css/style.css" rel="stylesheet" type="text/css"/>
+<link href="<%=apath%>/resources/css/orderList.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="<%=apath%>/resources/css/charisma-app.css">
 <link rel="stylesheet" type="text/css" href="<%=apath%>/resources/css/jquery.noty.css">
-<link rel="stylesheet" type="text/css" href="<%=apath%>/resources/css/bootstrap.css" />
+<link href="<%=apath%>/resources/css/bootstrap.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="<%=apath%>/resources/css/noty_theme_default.css">
-<script type="text/javascript" src="<%=apath%>/resources/js/jquery-3.1.1.min.js"></script>
-<script type="text/javascript" src="<%=apath%>/resources/js/jquery.noty.js"></script>
-<script type="text/javascript" src="<%=apath%>/resources/js/charisma.js"></script>
-<script type="text/javascript" src="<%=apath%>/resources/js/bootstrap.js"></script>
+<script  type="text/javascript" src="<%=apath%>/resources/js/jquery-3.1.1.min.js"></script>
+<script src ="<%=apath%>/resources/js/jquery.noty.js"></script>
+<script src ="<%=apath%>/resources/js/charisma.js"></script>
 <body>
 <div id="mainContent" class="mainContent">
 <!-- 头导航栏 -->
@@ -140,27 +139,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							   	 class="btn btn-block btn-primary" 
 							   	 type="button" 
 							   	 style="width:100px" 
-							   	 onclick="downloadXml('${good.xmlId}','0','myModal${good.goodId}')" 
+							   	 onclick="downloadXml('${good.xmlId}')" 
 							   	 value="已生成">
 							</div>
-							
-							<div class="modal fade" id='myModal${good.goodId}' tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    							<div class="modal-dialog">
-        							<div class="modal-content">
-            							<div class="modal-header">
-                							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                							<h4 class="modal-title" id="myModal">数据校验</h4>
-            							</div>
-            							<h5 class="modal-body" id='myModal${good.goodId}Message'></h5>
-            							<h5 class="modal-body">如有疑义：请联系本公司技术人员 联系方式：053288888888</h5>
-            							<div class="modal-footer">
-                							<button type="button" class="btn btn-primary" onclick="downloadXml('${good.xmlId}','1')">确认下载</button>
-            								<button type="button" class="btn btn-default" data-dismiss="modal">关闭窗口</button>
-            							</div>
-        							</div>
-    							</div> 
-							</div>
-							
 						  </c:when> 
 						  <c:when test="${good.status=='2'}">
 						    <p class="name"><em>已下载</em></p>
@@ -227,28 +208,10 @@ function logout(){
 	});
 } 
 
-function downloadXml(xmlId,label,modalId){
-	if(label=='0'){
-		$.ajax({
-			url : "<%=apath%>/goodsFile/getXmlInfo",
-			data: {"xmlId":xmlId,"label":"0"},
-			type:"POST",
-			dataType:"json",
-			async : false,
-			success : function(json){
-				$("#"+modalId+"Message").text(json.message);
-				$("#"+modalId).modal("show");
-			}
-		});
-	}else{
-		dowload(xmlId)
-	}
-	
-}
-function dowload(xmlId){
+function downloadXml(xmlId){
 	$.ajax({
 		url : "<%=apath%>/goodsFile/getXmlInfo",
-		data: {"xmlId":xmlId,"label":"1"},
+		data: {"xmlId":xmlId},
 		type:"POST",
 		dataType:"json",
 		async : false,

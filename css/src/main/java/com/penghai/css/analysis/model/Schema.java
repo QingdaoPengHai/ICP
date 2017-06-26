@@ -1,9 +1,6 @@
-package com.penghai.css.management.model.databaseModel;
+package com.penghai.css.analysis.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -63,35 +60,5 @@ public class Schema {
 		} 
 		return sql.toString();
 	}
-
-	/**
-	 * 获取schema中所有的数据库及其所有表中的索引字段
-	 * 
-	 * @return
-	 */
-	public HashMap<String, Map<String, List<String>>> getIndexNames() {
-		if (databases != null) {
-			// 所有数据库
-			HashMap<String, Map<String, List<String>>> result = new HashMap<>();
-			for(Database database:databases){
-				Map<String, List<String>> tables = new HashMap<>();
-				for (Table table : database.getTables()) {
-					// 每个集合中所有的索引名称
-					List<String> indexs = new ArrayList<>();
-					for (Column column : table.getColumns()) {
-						if (column.getPrimaryKey() || column.getCreateIndex()) {
-							// 添加索引字段
-							indexs.add(column.getName());
-						}
-					}
-					tables.put(table.getName(), indexs);
-				}
-				result.put(database.getName(), tables);
-			}
-			return result;
-		} else {
-			return null;
-		}
-	}
-
+	
 }

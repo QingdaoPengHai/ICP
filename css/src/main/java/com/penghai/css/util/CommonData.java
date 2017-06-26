@@ -57,6 +57,12 @@ public class CommonData {
 	public interface CM_REDIS_KEY {
 		// 用户购物车
 		public static final String REDIS_SHOPPING_CART = "shoppingCart";
+		// 存储全局序列的表名在redis中的key
+		public static final String SEQUENCE_DATABASE_INFO = CommonUtils.getProperties("commonDataConfig.properties",
+				"sequenceDatabaseInfo");
+		// 存储全局序列的数据库名在redis中的key
+		public static final String SEQUENCE_DATABASE_NAME = CommonUtils.getProperties("commonDataConfig.properties",
+				"sequenceDatabaseName");
 	}
 
 	/**
@@ -136,6 +142,9 @@ public class CommonData {
 		//rabbitMQ数据存储到Redis中的key
 		public static final String MQ_DATA_KEY_NAME = CommonUtils.getProperties("rabbitMQ.properties",
 				"MQDataKeyName");
+		//数据库Driver
+		public static final String DATABASE_DRIVER = CommonUtils.getProperties("commonDataConfig.properties",
+				"driver");
 	}
 
 	/**
@@ -247,5 +256,96 @@ public class CommonData {
 		public static final String LINKER_REPORT_INVALID_DATA = "20"; //上报数据无效
 		
 	}	
+	
+	/**
+	 * mycat配置文件
+	 * @author xuchao
+	 * Date：2017-06-02
+	 */
+	public interface CM_MYCAT_CONFIGURATION{
+		
+		// mycat配置文件路径
+		public static final String MYCAT_CONFIG_FILEPATH = CommonUtils.getProperties("mycatConfig.properties",
+				"mycatConfigFilePath");
+		
+		// mycat部署IP
+		public static final String MYCAT_SERVER_IP = CommonUtils.getProperties("mycatConfig.properties",
+				"mycatServerIp");
+		
+		// mycat用户名
+		public static final String MYCAT_USER = CommonUtils.getProperties("mycatConfig.properties",
+				"mycatUser");
+		
+		// mycat密码
+		public static final String MYCAT_PASSWORD = CommonUtils.getProperties("mycatConfig.properties",
+				"mycatPassword");
+		
+		// mycat脚本文件路径
+		public static final String MYCAT_BIN_PATH = CommonUtils.getProperties("mycatConfig.properties",
+				"mycatBinPath");
+		
+		// schemaDataNodes模板
+		public static final String SCHEMA_DATANODE_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"schemaDataNodeTemplate");
+		
+		// schemaDataHosts模板
+		public static final String SCHEMA_DATAHOST_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"schemaDataHostTemplate");
+		
+		// schemaTables模板
+		public static final String SCHEMA_TABLE_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"schemaTableTemplate");
+		
+		// schemaSchema模板
+		public static final String SCHEMA_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"schemaTemplate");
+		
+		// writeHostList列表
+		public static final String WRITE_HOSTLIST = CommonUtils.getProperties("mycatConfig.properties",
+				"writeHostList");
+		
+		// serverUserTemplate模板
+		public static final String SERVER_USER_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"serverUserTemplate");
+		
+		// 完整的schema.xml模板
+		public static final String TOTAL_SCHEMA_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"totalSchemaTemplate");
+		
+		// 完整的server.xml模板
+		public static final String TOTAL_SERVER_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"totalServerTemplate");
+		
+		// writeHost模板
+		public static final String SCHEMA_WRITEHOST_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"schemaWriteHostTemplate");
+		
+		// sequenceDbConf模板
+		public static final String SEQUENCE_DB_CONF_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"sequenceDbConfTemplate");
+		
+		// 完整的rule.xml模板
+		public static final String TOTAL_RULE_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"totalRuleTemplate");
+		
+		// rule.xml中tableRule模板
+		public static final String TABLE_RULE_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"tableRuleTemplate");
+		
+		// rule.xml中function模板
+		public static final String FUNCTION_TEMPLATE = CommonUtils.getProperties("mycatConfig.properties",
+				"functionTemplate");
+		
+	}
+	/**
+	 * 测试内容
+	 * @author 徐超
+	 * @Date 2017年6月6日 上午9:29:03
+	 */
+	public interface CM_MYCAT_TEST{
+		// xmlContent
+		public static final String XML_CONTENT = CommonUtils.getProperties("xmlContent.properties",
+				"xmlContent");
+	}
 	
 }

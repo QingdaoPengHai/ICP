@@ -1,4 +1,4 @@
-package com.penghai.css.management.business.impl;
+package com.penghai.css.analysis.business.impl;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,9 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.penghai.css.management.business.XMLDatabaseTransferBusinessI;
-import com.penghai.css.management.dao.mybatis.XMLDatabaseTransferDaoI;
-import com.penghai.css.management.model.databaseModel.Schema;
+import com.penghai.css.analysis.business.XMLDatabaseTransferBusinessI;
+import com.penghai.css.analysis.dao.mybatis.XMLDatabaseTransferDaoI;
+import com.penghai.css.analysis.model.Schema;
 import com.penghai.css.util.xml.XmlUtil;
 import com.penghai.css.util.xml.XmlUtil.CollectionWrapper;
 

@@ -1,4 +1,4 @@
-package com.penghai.css.management.business.impl;
+package com.penghai.css.analysis.business.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,21 +19,21 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.penghai.css.analysis.business.GoodsFileBusiness;
+import com.penghai.css.analysis.business.IMycatBusiness;
+import com.penghai.css.analysis.business.XMLDatabaseTransferBusinessI;
+import com.penghai.css.analysis.model.Database;
+import com.penghai.css.analysis.model.MycatWriteHost;
+import com.penghai.css.analysis.model.Schema;
+import com.penghai.css.analysis.model.Table;
+import com.penghai.css.analysis.model.TargetDatabase;
+import com.penghai.css.analysis.model.TargetTable;
 import com.penghai.css.common.model.HttpSession;
-import com.penghai.css.management.business.GoodsFileBusiness;
-import com.penghai.css.management.business.ICreateDataBaseAndTableByMongo;
-import com.penghai.css.management.business.IQueryIfExistSchema;
-import com.penghai.css.management.business.XMLDatabaseTransferBusinessI;
-import com.penghai.css.management.model.databaseModel.Database;
-import com.penghai.css.management.model.databaseModel.Schema;
-import com.penghai.css.management.model.databaseModel.Table;
-import com.penghai.css.management.model.databaseModel.TargetDatabase;
-import com.penghai.css.management.model.databaseModel.TargetTable;
+import com.penghai.css.util.HTTPUtil;
+import com.penghai.css.util.JedisUtils;
 import com.penghai.css.util.CommonData.CM_CONFIG_PROPERTIES;
 import com.penghai.css.util.CommonData.CM_LINKER_REDIS_PROPERTIES;
 import com.penghai.css.util.CommonData.CM_STORE_SERVER_FUNCTION;
-import com.penghai.css.util.HTTPUtil;
-import com.penghai.css.util.JedisUtils;
 import com.penghai.css.util.file.FileUtil;
 import com.penghai.css.util.xml.XmlUtil;
 import com.penghai.css.util.xml.XmlUtil.CollectionWrapper;
@@ -52,17 +52,15 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 	@Autowired
 	private JedisUtils jedisUtils;
 	@Autowired
+	private IMycatBusiness iMycatBusiness;
+	@Autowired
 	public XMLDatabaseTransferBusinessI xmlDatabaseTransferBusinessI;
-	@Autowired
-	private ICreateDataBaseAndTableByMongo iCreateDataBaseAndTableByMongo;
-	@Autowired
-	private IQueryIfExistSchema iQueryIfExistSchema;
 	/**
 	 * 获取单条订单xml文件详情信息
 	 * @author 秦超
 	 */
 	@Override
-	public Map<String, Object> getXmlInfo(String xmlId, int label) {
+	public Map<String, Object> getXmlInfo(String xmlId){
 		Map<String, Object> resultMap = new HashMap<>();
 		//请求url
 		String getXmlInfoUrl = CM_CONFIG_PROPERTIES.STORE_SERVER_URL + CM_STORE_SERVER_FUNCTION.ORDER_XML_DETAIL;
@@ -82,16 +80,6 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 				JSONObject xmlInfo = json.getJSONObject("xmlDetail");
 				String fileName = xmlInfo.getString("fileName");
 				String xmlContent = xmlInfo.getString("xmlContent");
-				
-				//根据xml信息获取scheme实体，提取linkerId进行比对 
-				Schema schemaObject = new Schema();
-				XmlUtil resultBinder = new XmlUtil(Schema.class,CollectionWrapper.class);
-				schemaObject = resultBinder.fromXml(xmlContent);
-				// 用户不关心数据库及集合名是否重名 则跳过
-				if (label == 0) {
-					// 用户点击下载则返回查询结果
-					return iQueryIfExistSchema.queryIfExistSchema(schemaObject);
-				}
 				//保存xml文件
 				boolean createFile =  FileUtil.createFile(fileName, xmlContent);
 				if(createFile == false){
@@ -99,6 +87,10 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 					resultMap.put("message", "xml文件名已存在，保存失败！");
 					return resultMap;
 				}
+				//根据xml信息获取scheme实体，提取linkerId进行比对 
+				Schema schemaObject = new Schema();
+				XmlUtil resultBinder = new XmlUtil(Schema.class,CollectionWrapper.class);
+				schemaObject = resultBinder.fromXml(xmlContent);
 				List<TargetDatabase> targetDatabases = schemaObject.getTargetDatabases();
 				//依次比对linkerId在Redis中存储的值中是否存在
 				for(TargetDatabase targetDatabase: targetDatabases){
@@ -107,13 +99,55 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 				}
 				//更新本地静态文件中记录的linkerId信息
 				updateLinkerIds();
-				/*
-				 * //获取建库语句; String createSql =
-				 * xmlDatabaseTransferBusinessI.analyzeXMLStringToSQL(xmlContent
-				 * ); //执行建库 xmlDatabaseTransferBusinessI.executeSQL(createSql);
-				 */
-				iCreateDataBaseAndTableByMongo.createDataBaseAndTable(schemaObject);
-//				updateStatusResult = HTTPUtil.loadURL(updateStatusUrl+"?email=qc@qq.com&password=123123&xmlId="+xmlId);
+				
+				Schema schema = iMycatBusiness.analyzedSchemaXmlContent(xmlContent);
+				
+				List<MycatWriteHost> writeHosts = iMycatBusiness.getWriteHosts();
+				
+				String createSQL = schema.conbineAllCreateSQL();
+				
+				boolean result = iMycatBusiness.createDatabasesAndTablesOnWriteHosts(writeHosts, createSQL);
+				
+				if(result){
+					System.out.println("建库成功");
+				}else{
+					System.out.println("建库失败");
+				}
+				
+				JSONObject returnJson = iMycatBusiness.getMycatConfigFilesContent(schema);
+				
+				Database database = (Database) returnJson.get("sequenceDataNodeDatabase");
+				MycatWriteHost writeHost = (MycatWriteHost) returnJson.get("sequenceDataNodeWriteHost");
+				
+				boolean createSequenceResult = iMycatBusiness.createGlobalSequence(database, writeHost);
+				if(createSequenceResult){
+					System.out.println("全局序列创建成功");
+					System.out.println(returnJson.getString("sequence_db_conf"));
+				}else{
+					System.out.println("全局序列创建失败");
+				}
+				
+				boolean createFileResult = iMycatBusiness.saveMycatConfigfiles(returnJson);
+				
+				if(createFileResult){
+					System.out.println("文件保存成功");
+				}else{
+					System.out.println("文件保存失败");
+				}
+				
+				boolean executeResult = iMycatBusiness.restartMycat();
+				
+				if(executeResult){
+					System.out.println("重启成功");
+				}else{
+					System.out.println("重启失败");
+				}
+				
+//				//获取建库语句;
+//				String createSql = xmlDatabaseTransferBusinessI.analyzeXMLStringToSQL(xmlContent);
+//				//执行建库
+//				xmlDatabaseTransferBusinessI.executeSQL(createSql);
+				
 				updateStatusResult = HTTPUtil.loadURL(updateStatusUrl+"?email=" + email + "&password=" + password + "&xmlId="+xmlId);
 			}else {
 				resultMap.put("code", 0);
@@ -409,6 +443,7 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 		resultJson.put("databaseInfoJson", "");
 		return resultJson;
 	}
+	
 	/**
 	 * 获取database与targetdatabase关联信息
 	 * @author 徐超

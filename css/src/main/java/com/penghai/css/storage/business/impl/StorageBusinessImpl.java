@@ -1,23 +1,25 @@
 package com.penghai.css.storage.business.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
 import com.penghai.css.storage.business.StorageBusinessI;
-import com.penghai.css.util.MongoUtil;
+import com.penghai.css.util.CommonData.CM_CONFIG_PROPERTIES;
+import com.penghai.css.util.CommonData.CM_INFO_DATA;
+import com.penghai.css.util.CommonData.CM_REDIS_KEY;
+import com.penghai.css.util.JedisUtils;
+
+import redis.clients.jedis.Jedis;
 
 /**
  * 存储模块业务类
@@ -26,10 +28,13 @@ import com.penghai.css.util.MongoUtil;
  */
 @Service("storageBusinessImpl")
 public class StorageBusinessImpl implements StorageBusinessI{
-
-	@Autowired
-	private MongoUtil mongoUtil;
 	
+	//redis
+	@Autowired
+	private JedisUtils jedisUtils = null;
+	
+	Logger log = Logger.getLogger(StorageBusinessImpl.class);
+
 	/**
 	 * 将Josn数据转为可执行的sql
 	 * @author 徐超
@@ -74,6 +79,62 @@ public class StorageBusinessImpl implements StorageBusinessI{
 		}
 		return sql.toString();
 	}
+	
+	/**
+	 * 将Josn数据转为可执行的sql,for Mycat
+	 * @author 徐超
+	 * @Date 2017年6月8日22:31:17
+	 * @param json
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public String transferJsonToSqlForMycat(String json,long sequenceStart) throws Exception {
+		StringBuffer sql = new StringBuffer();
+		long sequenceStartInside = sequenceStart;
+		try {
+			JSONObject jsonObject = new JSONObject();
+			//将jsonString转为JSONObject对象
+			jsonObject = JSONObject.parseObject(json);
+			//获取数据库名称
+			String databaseName = jsonObject.getString("database");
+			//开始拼接sql
+//			sql.append(" USE ").append(databaseName).append("; ");
+			//获取数据数组
+			JSONArray dataArray = jsonObject.getJSONArray("data");
+			//循环获取表数据
+			for(int i=0;i<dataArray.size();i++){
+				JSONObject tableBody = dataArray.getJSONObject(i);
+				String tableName = tableBody.getString("table");
+				JSONArray tableData = tableBody.getJSONArray("tableData");
+				String columus = tableBody.getString("columus");
+				String primaryKey = tableBody.getString("primaryKey");
+				//获取主键位置
+				int primaryKeyIndex = getPrimaryKeyIndex(primaryKey,columus);
+				sql.append(" INSERT INTO ")
+				   .append(databaseName)
+				   .append(".").append(tableName)
+				   .append(columus)
+				   .append(" VALUES ");
+				//循环获取字段列表
+				for(int j=0;j<tableData.size();j++){
+					JSONArray rowData = tableData.getJSONArray(j);
+					String rowDataString = rowData.toJSONString();
+//					rowDataString = rowDataString.replace("[", "(").replace("]", ")");
+					rowDataString = replacePrimaryKey(rowDataString,primaryKeyIndex,sequenceStartInside);
+					sequenceStartInside++;
+					sql.append(rowDataString).append(",");
+				}
+				//删除最后一个逗号
+				sql.deleteCharAt(sql.length()-1);
+				//拼接结束
+				sql.append("; ");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sql.toString();
+	}
 
 	/**
 	 * 将批量的JosnSet数据转为可执行的sql,一个sql
@@ -83,6 +144,7 @@ public class StorageBusinessImpl implements StorageBusinessI{
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public String transferBulkJsonToSql(Set<String> jsonSet) throws Exception{
 		StringBuffer sql = new StringBuffer();
 		//循环set对象,分别转换每一个sql
@@ -100,6 +162,7 @@ public class StorageBusinessImpl implements StorageBusinessI{
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public String transferBulkJsonListToSql(List<String> jsonList) throws Exception{
 		StringBuffer sql = new StringBuffer();
 		//循环List对象,分别转换每一个sql
@@ -109,89 +172,185 @@ public class StorageBusinessImpl implements StorageBusinessI{
 		return sql.toString();
 	}
 	/**
-	 * 将批量的JosnList数据转为MongoDB支持的List<DBObject>
+	 * 将批量的JosnList数据转为可执行的sql,一个sql,for Mycat
 	 * @author 徐超
-	 * @Date 2017年6月20日22:31:10
+	 * @Date 2017年6月8日 下午10:28:32
 	 * @param jsonList
-	 * @return List<DBObject>
+	 * @return
 	 * @throws Exception
 	 */
-	public JSONObject transferListJsonToListDBObject(List<String> jsonList) throws Exception{
-		//定义返回的JSON对象
-		JSONObject resultJson = new JSONObject();
-		//定义存放数据的JSON数组
-		JSONArray dataListArray = new JSONArray();
-		//数据库名称
-		String databaseName = "";
-		//遍历每一个JSONString
-		for(String jsonString:jsonList){
-			//将List中的每一个JSONString转为JSONObject
+	@Override
+	public String transferBulkJsonListToSqlForMycat(List<String> jsonList,long currentSequence) throws Exception{
+		StringBuffer sql = new StringBuffer();
+		int insertNumber = 0;
+		//循环List对象,分别转换每一个sql
+		for(String jsonString : jsonList){
+			long sequenceStart = currentSequence+insertNumber;
+			sql.append(transferJsonToSqlForMycat(jsonString,sequenceStart));
 			JSONObject jsonObject = new JSONObject();
+			//将jsonString转为JSONObject对象
 			jsonObject = JSONObject.parseObject(jsonString);
-			//获取数据库名称
-			databaseName = jsonObject.getString("database");
 			//获取数据数组
 			JSONArray dataArray = jsonObject.getJSONArray("data");
-			//循环获取表数据
 			for(int i=0;i<dataArray.size();i++){
-				JSONObject collectionJson = new JSONObject();
-				List<Map<String,Object>> mapList = new ArrayList<Map<String,Object>>();
 				JSONObject tableBody = dataArray.getJSONObject(i);
-				//获取将要写入mongo的collection的名字
-				String collectionName = tableBody.getString("table");
-				
-				collectionJson.put("collectionName", collectionName);
 				JSONArray tableData = tableBody.getJSONArray("tableData");
-				//循环获取字段列表
-				for(int j=0;j<tableData.size();j++){
-					JSONObject rowData = tableData.getJSONObject(j);
-					//组装数据Map
-					Map<String,Object> map = new HashMap<String,Object>(rowData);
-					mapList.add(map);
-				}
-				collectionJson.put("dataMapList", mapList);
-				dataListArray.add(collectionJson);
+				insertNumber = insertNumber+tableData.size();
 			}
 		}
-		resultJson.put("databaseName", databaseName);
-		resultJson.put("dataList", dataListArray);
-		
-		return resultJson;
+		return sql.toString();
 	}
 	
 	/**
-	 * 将MongoDB支持的List<DBObject>写入MongoDB
+	 * 获取当次插入的数据数量
 	 * @author 徐超
-	 * @Date 2017年6月20日22:32:20
-	 * @param dbObjectList
-	 * @return WriteResult
-	 * @throws Exception
+	 * @Date 2017年6月9日 上午8:34:59
+	 * @return
 	 */
-	public void insertDatasIntoMongoDB(JSONObject dataJSONObject) throws Exception{
-		//获取数据库名称
-		String databaseName = dataJSONObject.getString("databaseName");
-		JSONArray dataListArray = dataJSONObject.getJSONArray("dataList");
-		//获取数据库对象
-		DB db = mongoUtil.getDataBases(databaseName);
-		//遍历数据数组,分别向每一个collection写入数据
-		for(int i=0;i<dataListArray.size();i++){
+	@Override
+	public int getInsertNumber(List<String> jsonList){
+		int totalNum = 0;
+		
+		for(String jsonString : jsonList){
 			
-			JSONObject collectionObject = dataListArray.getJSONObject(i);
-			String collectionName = collectionObject.getString("collectionName");
-			List<Map<String,Object>> dataMapList = 
-					(List<Map<String,Object>>) collectionObject.get("dataMapList");
-			//获取collection对象
-			DBCollection collection = mongoUtil.useCollection(db,collectionName);
-			
-			List<DBObject> dbOblectList = new ArrayList<DBObject>();
-			//遍历数据Map
-			for(Map<String,Object> map:dataMapList){
-				DBObject dbObject = new BasicDBObject(map);
-				//组装要写入MongoDB的DBObject
-				dbOblectList.add(dbObject);
+			JSONObject jsonObject = new JSONObject();
+			//将jsonString转为JSONObject对象
+			jsonObject = JSONObject.parseObject(jsonString);
+			//获取数据数组
+			JSONArray dataArray = jsonObject.getJSONArray("data");
+			for(int i=0;i<dataArray.size();i++){
+				JSONObject tableBody = dataArray.getJSONObject(i);
+				JSONArray tableData = tableBody.getJSONArray("tableData");
+				totalNum = totalNum + tableData.size();
 			}
-			//执行写入
-			collection.insert(dbOblectList);
+			
 		}
+		
+		return totalNum;
+	}
+	/**
+	 * 获取并修改全局序列信息
+	 * @author 徐超
+	 * @Date 2017年6月9日 上午8:45:15
+	 * @param insertNumber 当次写入的条数
+	 * @return long 本次序列的起始值 -1表示有错误
+	 */
+	@Override
+	public long getAndChangeCurrentsequenceInfo(int insertNumber){
+		Jedis jedis = null;
+		long sequenceStart = 0L;
+		String sequenceDatabaseInfo = "";
+		String sequenceDatabaseName = "";
+		try {
+			//获取redis对象
+			jedis = jedisUtils.getJedis();
+			sequenceDatabaseInfo = jedis.get(CM_REDIS_KEY.SEQUENCE_DATABASE_INFO);
+			sequenceDatabaseName = jedis.get(CM_REDIS_KEY.SEQUENCE_DATABASE_NAME);
+		} catch (Exception e) {
+			log.error(CM_INFO_DATA.SYSTEM_ERROR,e);
+			return -1;
+		} finally {
+			if (jedis != null){
+				jedis.close();
+			}
+		}
+		//1.查询当前数值
+		if(null==sequenceDatabaseInfo 
+				|| "".equals(sequenceDatabaseInfo) 
+				|| null==sequenceDatabaseName 
+				|| "".equals(sequenceDatabaseName)){
+			return -1;
+		}
+		JSONObject sequenceDatabaseInfoJson = JSONObject.parseObject(sequenceDatabaseInfo);
+		String databaseUser = sequenceDatabaseInfoJson.getString("user");
+		String databasePassword = sequenceDatabaseInfoJson.getString("password");
+		String databaseUrl = sequenceDatabaseInfoJson.getString("url");
+		StringBuffer databaseConnectionURL = new StringBuffer();
+		databaseConnectionURL.append("jdbc:mysql://")
+			.append(databaseUrl).append("/")
+			.append(sequenceDatabaseName)
+			.append("?characterEncoding=utf8&allowMultiQueries=true");
+		StringBuffer selectSQL = new StringBuffer();
+		selectSQL.append("SELECT current_value,increment FROM MYCAT_SEQUENCE;");
+		String driver = CM_CONFIG_PROPERTIES.DATABASE_DRIVER;
+		long current_value = 0L;
+		int increment = 0;
+		try {
+			Class.forName(driver);
+	    	//新建连接
+	    	Connection connection = DriverManager.getConnection(databaseConnectionURL.toString(), databaseUser,databasePassword);
+	    	//新建预加载的查询语句
+        	PreparedStatement preparedStatementSelect = connection.prepareStatement(selectSQL.toString());
+        	//结果集
+        	ResultSet resultSet = preparedStatementSelect.executeQuery();
+        	while (resultSet.next()) {
+        		current_value = resultSet.getLong(1);
+        		increment = resultSet.getInt(2);
+        	}
+        	long updateCurrentValue = insertNumber+current_value;
+        	StringBuffer updateSQL = new StringBuffer();
+        	updateSQL.append("UPDATE MYCAT_SEQUENCE SET current_value = ")
+        			 .append(updateCurrentValue)
+        			 .append(";");
+        	
+        	//新建预加载的查询语句
+        	PreparedStatement preparedStatementUpdate = connection.prepareStatement(updateSQL.toString());
+        	//更新
+        	preparedStatementUpdate.executeUpdate();
+		} catch (Exception e) {
+			log.error(CM_INFO_DATA.SYSTEM_ERROR,e);
+		}
+		sequenceStart = current_value;
+		return sequenceStart;
+	}
+	/**
+	 * 获取主键的位置
+	 * @author 徐超
+	 * @Date 2017年6月9日 下午1:04:51
+	 * @param primaryKey
+	 * @param columns
+	 * @return
+	 */
+	public int getPrimaryKeyIndex(String primaryKey,String columns){
+		int index = 0;
+		
+		columns = columns.substring(1, columns.length()-1);
+		String[] columnsArray = columns.split(",");
+		for(int i=0;i<columnsArray.length;i++){
+			if(primaryKey.equals(columnsArray[i])){
+				index = i;
+			}
+		}
+		return index;
+	}
+	
+	/**
+	 * 替换数据中主键的值为全局序列的值
+	 * @author 徐超
+	 * @Date 2017年6月9日 下午1:26:23
+	 * @param rowDataString
+	 * @param primaryKeyIndex
+	 * @param sequenceStartInside
+	 * @return
+	 */
+	public String replacePrimaryKey(String rowDataString,int primaryKeyIndex,long sequenceStartInside){
+		String rowDataStringTemp = rowDataString;
+		StringBuffer rowDataStringReturn = new StringBuffer();
+		
+		rowDataStringTemp = rowDataStringTemp.substring(1, rowDataStringTemp.length()-1);
+		String[] rowDataArray = rowDataStringTemp.split(",");
+		rowDataArray[primaryKeyIndex] = "\""+sequenceStartInside+"\"";
+		
+		rowDataStringReturn.append("(");
+		for(int i=0;i<rowDataArray.length;i++){
+			
+			rowDataStringReturn.append(rowDataArray[i]).append(",");
+			
+		}
+		//删除最后一个逗号
+		rowDataStringReturn.deleteCharAt(rowDataStringReturn.length()-1);
+		rowDataStringReturn.append(")");
+		
+		return rowDataStringReturn.toString();
 	}
 }

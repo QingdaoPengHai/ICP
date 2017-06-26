@@ -1,4 +1,4 @@
-package com.penghai.css.management.controller;
+package com.penghai.css.analysis.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.penghai.css.analysis.business.GoodsFileBusiness;
 import com.penghai.css.common.controller.BaseController;
-import com.penghai.css.management.business.GoodsFileBusiness;
 
 /**
  * 订单文件处理
@@ -35,10 +35,10 @@ public class GoodsFileController extends BaseController{
 	public Map<String, Object> getXmlInfo(HttpServletRequest request, String xmlId){
 		//TODO 获取xml文件内容
 		Map<String, Object> resultMap = new HashMap<>();
-		int label = Integer.valueOf(request.getParameter("label"));
+		
 //		String xmlId = request.getAttribute("xmlId").toString();
 		
-		resultMap = goodsFileBusiness.getXmlInfo(xmlId, label);
+		resultMap = goodsFileBusiness.getXmlInfo(xmlId);
 		
 		return resultMap;
 	}

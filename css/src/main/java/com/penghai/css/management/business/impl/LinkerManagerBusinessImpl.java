@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSONObject;
-import com.penghai.css.management.business.GoodsFileBusiness;
+import com.penghai.css.analysis.business.GoodsFileBusiness;
 import com.penghai.css.management.business.LinkerManagerBusiness;
 import com.penghai.css.management.dao.mybatis.LinkerMapper;
 import com.penghai.css.management.model.Linker;
@@ -117,7 +117,7 @@ public class LinkerManagerBusinessImpl implements LinkerManagerBusiness{
 				//设置返回值
 				resultJson.put("databaseInfoJson", databaseInfoJson);
 				resultJson.put("targetDatabaseXml", xmlTargetDatabase);
-				resultJson.put("code", CM_LINKER_RETURN_CODE.LINKER_RETURN_OK);	
+				resultJson.put("code", CM_LINKER_RETURN_CODE.LINKER_RETURN_OK);				
 			}
 		}
 		

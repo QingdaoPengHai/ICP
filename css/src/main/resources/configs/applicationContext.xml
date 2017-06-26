@@ -24,8 +24,7 @@
 		<property name="locations">
 			<array>
 				<value>classpath:configs/jdbc.properties</value>
-	            <value>classpath:configs/redis.properties</value>
-	            <value>classpath:configs/mongo.properties</value>	            
+	            <value>classpath:configs/redis.properties</value>	            
 	    	</array>
 	    </property>
 	</bean>
@@ -33,5 +32,4 @@
 	<import resource="spring-quartz.xml"/>
 	<import resource="spring-redis.xml"/>
 	<import resource="spring-dao.xml"/>
-	<import resource="spring-mongo.xml"/>
 </beans>

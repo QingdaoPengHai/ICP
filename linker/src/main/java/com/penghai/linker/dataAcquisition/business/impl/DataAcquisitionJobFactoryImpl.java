@@ -308,27 +308,19 @@ public class DataAcquisitionJobFactoryImpl implements IDataAcquisitionJobFactory
 		json.put("linker", linkerId);
 		json.put("database", targetDatabaseName);
 		int totalNumber = 0;
-		
-		//解析refColumns
-		//1.去掉两头的括号
-		refColumns = refColumns.substring(1,refColumns.length()-1);
-		//2.转为String数组
-		String[] refColumnsArray = refColumns.split(",");
 		try {
 			if(resultSet.next()){
 				resultSet.first();
 				resultSet.previous();
 				//遍历返回数据结果集
 				while (resultSet.next()) {
-//					JSONArray columnDataArray = new JSONArray();//表列表信息columnData
-					JSONObject columnDataObject = new JSONObject();//表列表信息columnData
+					JSONArray columnDataArray = new JSONArray();//表列表信息columnData
 		    		int columnCount = resultSet.getMetaData().getColumnCount();
 		    		//遍历每一列
 		    		for(int i=1;i<columnCount+1;i++){
-		    			columnDataObject.put(refColumnsArray[i-1], resultSet.getString(i));
-//		    			columnDataArray.add(resultSet.getString(i));
+		    			columnDataArray.add(resultSet.getString(i));
 		    		}
-		    		tableDataArray.add(columnDataObject);
+		    		tableDataArray.add(columnDataArray);
 		    	}
 				resultSet.last();
 				totalNumber = resultSet.getRow();
@@ -337,6 +329,8 @@ public class DataAcquisitionJobFactoryImpl implements IDataAcquisitionJobFactory
 				return null;
 			}
 			//组装JSON结构
+			dataJson.put("columus", refColumns);
+			dataJson.put("primaryKey", refPrimaryKey);
 			dataJson.put("table", targetTableName);
 			dataJson.put("tableData", tableDataArray);
 			dataArray.add(dataJson);

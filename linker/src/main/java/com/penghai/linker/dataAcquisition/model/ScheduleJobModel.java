@@ -151,6 +151,4 @@ public class ScheduleJobModel {
 	public void setRefPrimaryKey(String refPrimaryKey) {
 		this.refPrimaryKey = refPrimaryKey;
 	}
-    
-    
 }

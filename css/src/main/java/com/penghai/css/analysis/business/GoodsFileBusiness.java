@@ -1,4 +1,4 @@
-package com.penghai.css.management.business;
+package com.penghai.css.analysis.business;
 
 import java.util.Map;
 
@@ -15,13 +15,14 @@ public interface GoodsFileBusiness {
 	 * @author 秦超
 	 * @time 2017年5月10日
 	 */
-	Map<String, Object> getXmlInfo(String goodsINfoId, int label);
+	Map<String, Object> getXmlInfo(String goodsINfoId);
 	/**
 	 * 获取linker所需xml片段
 	 * @author 秦超
 	 * @time 2017年5月10日
 	 */
 	String getDatabaseInfoFromXml(String linkerId);
+	
 	/**
 	 * 获取linker所需xml片段--包含database和targetDatabase
 	 * @author 徐超

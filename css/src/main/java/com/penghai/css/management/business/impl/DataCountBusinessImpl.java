@@ -15,12 +15,11 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.penghai.css.analysis.model.Database;
+import com.penghai.css.analysis.model.Schema;
 import com.penghai.css.management.business.DataCountBusiness;
 import com.penghai.css.management.dao.mybatis.DataCountDaoI;
-import com.penghai.css.management.model.databaseModel.Database;
-import com.penghai.css.management.model.databaseModel.Schema;
 import com.penghai.css.util.CommonData.CM_CONFIG_PROPERTIES;
-import com.penghai.css.util.MongoUtil;
 import com.penghai.css.util.xml.XmlUtil;
 import com.penghai.css.util.xml.XmlUtil.CollectionWrapper;
 
@@ -33,8 +32,6 @@ import com.penghai.css.util.xml.XmlUtil.CollectionWrapper;
 public class DataCountBusinessImpl implements DataCountBusiness{
 	@Autowired
 	private DataCountDaoI dataCountDaoI;
-	@Autowired
-	private MongoUtil mongoUtil;
 	
 	private static Logger log = Logger.getLogger(DataCountBusinessImpl.class);
 	/**
@@ -77,7 +74,7 @@ public class DataCountBusinessImpl implements DataCountBusiness{
 		JSONArray resultArray = new JSONArray();
 		List<HashMap<String, Object>> tableDataCount = null;
 		try {
-			tableDataCount = mongoUtil.getDatabaseTableCount(databaseName);
+			tableDataCount = dataCountDaoI.getDatabaseTableCount(databaseName);
 			
 			for(HashMap<String, Object> tableCount:tableDataCount){
 				JSONObject tableJson = new JSONObject();

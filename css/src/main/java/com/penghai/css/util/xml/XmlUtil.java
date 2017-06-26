@@ -12,7 +12,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAnyElement;
 
 import com.alibaba.fastjson.JSONObject;
-import com.penghai.css.management.model.databaseModel.Schema;
+import com.penghai.css.analysis.model.Schema;
 
 /**
  * 解析XML工具类
@@ -50,7 +50,8 @@ public class XmlUtil{
         try {  
             StringReader reader = new StringReader(xml);  
             return (T) createUnmarshaller().unmarshal(reader);  
-        } catch (JAXBException e) {  
+        } catch (JAXBException e) { 
+        	e.printStackTrace();
             throw new RuntimeException(e);  
         }  
     }  

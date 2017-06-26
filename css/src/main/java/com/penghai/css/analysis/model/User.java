@@ -1,4 +1,4 @@
-package com.penghai.css.management.model.databaseModel;
+package com.penghai.css.analysis.model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
