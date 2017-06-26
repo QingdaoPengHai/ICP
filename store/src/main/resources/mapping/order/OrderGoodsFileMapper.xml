@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.order.dao.mybatis.OrderGoodsFileMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.order.model.OrderGoodsFile" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="orderId" property="orderId" jdbcType="INTEGER" />
+    <result column="goodsId" property="goodsId" jdbcType="INTEGER" />
+    <result column="xmlContent" property="xmlContent" jdbcType="VARCHAR" />
+    <result column="fileName" property="fileName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, orderId, goodsId, xmlContent, fileName, status, version, updateTime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from order_goods_file
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from order_goods_file
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.order.model.OrderGoodsFile" useGeneratedKeys="true" keyProperty="id" >
+    insert into order_goods_file (orderId, goodsId, xmlContent, 
+      fileName, status, version, updateTime
+      )
+    values (#{orderId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, #{xmlContent,jdbcType=VARCHAR}, 
+      #{fileName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{version,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.order.model.OrderGoodsFile" useGeneratedKeys="true" keyProperty="id" >
+    insert into order_goods_file
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        orderId,
+      </if>
+      <if test="goodsId != null" >
+        goodsId,
+      </if>
+      <if test="xmlContent != null" >
+        xmlContent,
+      </if>
+      <if test="fileName != null" >
+        fileName,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="updateTime != null" >
+        updateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="xmlContent != null" >
+        #{xmlContent,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateOrderGoodsFileStatusByPrimaryKey" parameterType="com.penghai.store.order.model.OrderGoodsFile" >
+    update order_goods_file
+    set status = #{status,jdbcType=INTEGER}
+    where id = #{id}
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.order.model.OrderGoodsFile" >
+    update order_goods_file
+    <set >
+      <if test="orderId != null" >
+        orderId = #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null" >
+        goodsId = #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="xmlContent != null" >
+        xmlContent = #{xmlContent,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        fileName = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.order.model.OrderGoodsFile" >
+    update order_goods_file
+    set orderId = #{orderId,jdbcType=INTEGER},
+      goodsId = #{goodsId,jdbcType=INTEGER},
+      xmlContent = #{xmlContent,jdbcType=VARCHAR},
+      fileName = #{fileName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      version = #{version,jdbcType=INTEGER},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据订单ID和商品ID有选择性的更新 -->
+  <update id="updateByOrderIdAndGoodsIdSelective" parameterType="com.penghai.store.order.model.OrderGoodsFile" >
+    update order_goods_file
+    <set >
+      <if test="xmlContent != null" >
+        xmlContent = #{xmlContent,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        fileName = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where orderId = #{orderId,jdbcType=INTEGER}
+    and goodsId = #{goodsId,jdbcType=INTEGER}
+  </update>
+  <!-- 获取用户所有订单对应的XML_List -->
+  <select id="getUserOrderXmlList" parameterType="string" resultMap="BaseResultMap">
+  	SELECT
+		ogf.id AS id,
+		ogf.fileName AS fileName,
+		ogf.`status` AS status,
+		ogf.version AS version,
+		ogf.updateTime AS updateTime
+	FROM
+		`order` torder,
+		order_goods_file ogf,
+		`user` tuser
+	WHERE
+		tuser.email = #{email,jdbcType=VARCHAR}
+	AND tuser.id = torder.userId
+	AND torder.id = ogf.orderId
+  </select>
+  <select id="getOrderXmlList" resultMap="BaseResultMap">
+  	SELECT
+		ogf.id AS id,
+		ogf.fileName AS fileName,
+		ogf.`status` AS status,
+		ogf.version AS version,
+		ogf.updateTime AS updateTime 
+	FROM
+		order_goods_file ogf 
+	WHERE 
+		ogf.orderId = #{orderId,jdbcType=VARCHAR}
+  </select>
+  <!-- 获取用户指定xml详细信息 -->
+  <select id="getUserOrderXmlDetail" parameterType="string" resultMap="BaseResultMap">
+  	SELECT
+		ogf.xmlContent AS xmlContent,
+		ogf.fileName AS fileName
+	FROM
+		order_goods_file ogf
+	WHERE
+		id = #{xmlId}
+  </select>
+  <!-- 根据goodsId和orderId获取用户指定xml详细信息 -->
+  <select id="getUserOrderXmlDetailByOrderIdAndGoodsId" parameterType="com.penghai.store.order.model.OrderGoodsFile" resultMap="BaseResultMap">
+  	SELECT
+		ogf.xmlContent AS xmlContent,
+		ogf.version AS version
+	FROM
+		order_goods_file ogf
+	WHERE
+		ogf.orderId = #{orderId,jdbcType=INTEGER}
+	AND ogf.goodsId = #{goodsId,jdbcType=INTEGER}
+  </select>
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.good.dao.mybatis.GoodsPictureMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.good.model.GoodsPicture" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="goodId" property="goodId" jdbcType="INTEGER" />
+    <result column="pictureUrl" property="pictureUrl" jdbcType="VARCHAR" />
+    <result column="addtime" property="addtime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goodId, pictureUrl, addtime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_pictureture
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_picture
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.good.model.GoodsPicture" useGeneratedKeys="true" keyProperty="id" >
+    insert into goods_picture (goodId, pictureUrl, addtime
+      )
+    values (#{goodId,jdbcType=INTEGER}, #{pictureUrl,jdbcType=VARCHAR}, #{addtime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.good.model.GoodsPicture" useGeneratedKeys="true" keyProperty="id" >
+    insert into goods_picture
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodId != null" >
+        goodId,
+      </if>
+      <if test="pictureUrl != null" >
+        pictureUrl,
+      </if>
+      <if test="addtime != null" >
+        addtime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodId != null" >
+        #{goodId,jdbcType=INTEGER},
+      </if>
+      <if test="pictureUrl != null" >
+        #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        #{addtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.good.model.GoodsPicture" >
+    update goods_picture
+    <set >
+      <if test="goodId != null" >
+        goodId = #{goodId,jdbcType=INTEGER},
+      </if>
+      <if test="pictureUrl != null" >
+        pictureUrl = #{pictureUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        addtime = #{addtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.good.model.GoodsPicture" >
+    update goods_picture
+    set goodId = #{goodId,jdbcType=INTEGER},
+      pictureUrl = #{pictureUrl,jdbcType=VARCHAR},
+      addtime = #{addtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据商品ID获取图片列表 -->
+  <select id="getPictureListByGoodsId" resultMap="BaseResultMap">
+  	SELECT
+		*
+	FROM
+		goods_picture
+	WHERE
+		goodId = #{goodsId}
+  </select>
+  <!-- 插入图片列表 -->
+  <insert id="insertPictureList" parameterType="com.penghai.store.good.model.GoodsPicture">
+  	INSERT INTO goods_picture (goodId, pictureUrl, addtime)
+	VALUES
+	<foreach collection="list" item="item" index="index" separator=",">
+		(#{item.goodId,jdbcType=INTEGER}, 
+		#{item.pictureUrl,jdbcType=VARCHAR}, 
+		#{item.addtime,jdbcType=TIMESTAMP})
+	 </foreach>
+  	
+  </insert>
+  <!-- 删除图片列表 -->
+  <delete id="deletePictureList">
+  	DELETE
+	FROM
+		goods_picture
+	WHERE
+		goodId = #{goodsId}
+  </delete>
+</mapper>

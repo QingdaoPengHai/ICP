@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.admin.dao.mybatis.AdminMapper" >
+  <sql id="Base_Column_List" >
+    id, name, email,password
+  </sql>
+  <select id="checkAddUnique" resultType="string" 
+  	parameterType="java.util.Map">
+  	select count(1)
+  	from adminuser where email = #{email,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="checkAuth" resultType="string"
+  	parameterType="java.util.Map">
+  	select count(1)
+  	from adminuser 
+  	where email = #{email} and password = #{password}
+  </select>
+  
+  <select id="selectByCondition" resultType="java.util.Map"
+  	parameterType="java.util.Map">
+  	select 
+  	<include refid="Base_Column_List" />
+    from adminuser
+    where email=#{email}
+  </select>
+  
+</mapper>

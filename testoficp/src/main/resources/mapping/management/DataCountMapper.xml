@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.testoficp.management.dao.mybatis.DataCountDaoI" >
+  
+  <!-- 执行任意sql -->
+  <select id="executeSQL" parameterType="string" resultType="java.util.HashMap">
+  	${value}
+  </select>
+  
+  <!-- 获取数据库列表 -->
+  <select id="getDatabasesList" resultType="string">
+  	show databases;
+  </select>
+
+  <!-- 获取某一数据库的表信息及数据量 -->
+  <select id="getDatabaseTableCount" resultType="java.util.LinkedHashMap">
+  	SELECT TABLE_NAME tableName, TABLE_ROWS count FROM information_schema.tables WHERE TABLE_SCHEMA = #{databaseName};
+  </select>
+</mapper>

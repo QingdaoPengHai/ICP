@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.order.dao.mybatis.OrderInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.order.model.OrderInfo" >
+    <id column="orderId" property="orderId" jdbcType="INTEGER" />
+    <id column="goodsId" property="goodsId" jdbcType="INTEGER" />
+    <result column="goodsName" property="goodsName" jdbcType="VARCHAR" />
+    <result column="goodsNumber" property="goodsNumber" jdbcType="INTEGER" />
+    <result column="goodsPrice" property="goodsPrice" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    orderId, goodsId, goodsNumber, goodsPrice
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.penghai.store.order.model.OrderInfoKey" >
+    select 
+    <include refid="Base_Column_List" />
+    from orderInfo
+    where orderId = #{orderId,jdbcType=INTEGER}
+      and goodsId = #{goodsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.penghai.store.order.model.OrderInfoKey" >
+    delete from orderInfo
+    where orderId = #{orderId,jdbcType=INTEGER}
+      and goodsId = #{goodsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.order.model.OrderInfo" >
+    insert into orderInfo (orderId, goodsId, goodsNumber, 
+      goodsPrice)
+    values (#{orderId,jdbcType=INTEGER}, #{goodsId,jdbcType=INTEGER}, #{goodsNumber,jdbcType=INTEGER}, 
+      #{goodsPrice,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.order.model.OrderInfo" >
+    insert into orderInfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        orderId,
+      </if>
+      <if test="goodsId != null" >
+        goodsId,
+      </if>
+      <if test="goodsNumber != null" >
+        goodsNumber,
+      </if>
+      <if test="goodsPrice != null" >
+        goodsPrice,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNumber != null" >
+        #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="goodsPrice != null" >
+        #{goodsPrice,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.order.model.OrderInfo" >
+    update orderInfo
+    <set >
+      <if test="goodsNumber != null" >
+        goodsNumber = #{goodsNumber,jdbcType=INTEGER},
+      </if>
+      <if test="goodsPrice != null" >
+        goodsPrice = #{goodsPrice,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where orderId = #{orderId,jdbcType=INTEGER}
+      and goodsId = #{goodsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.order.model.OrderInfo" >
+    update orderInfo
+    set goodsNumber = #{goodsNumber,jdbcType=INTEGER},
+      goodsPrice = #{goodsPrice,jdbcType=DECIMAL}
+    where orderId = #{orderId,jdbcType=INTEGER}
+      and goodsId = #{goodsId,jdbcType=INTEGER}
+  </update>
+  <insert id="insertList"
+      parameterType="com.penghai.store.order.model.OrderInfo">
+     insert into orderInfo 
+		(orderId, goodsId, goodsNumber, goodsPrice)
+	 values
+	 <foreach collection="list" item="item" index="index"
+		separator=",">
+		(#{item.orderId,jdbcType=INTEGER}, 
+		#{item.goodsId,jdbcType=INTEGER}, 
+		#{item.goodsNumber,jdbcType=INTEGER},
+		#{item.goodsPrice,jdbcType=DECIMAL})
+	 </foreach>
+  </insert>
+  <delete id="deleteByOrderId" parameterType="com.penghai.store.order.model.OrderInfo">
+  	delete from orderInfo
+  	where orderId = #{orderId,jdbcType=INTEGER}
+  </delete>
+  <!-- 为返回订单商品xml生产状态重写的sql by xuchao-->
+  <select id="selectByOrderId" parameterType="com.penghai.store.order.model.OrderInfo" resultType="java.util.Map">
+  	SELECT
+		oi.orderId,
+		oi.goodsId,
+		oi.goodsNumber,
+		oi.goodsPrice,
+		g.goodName AS goodsName,
+		g.goodModel AS goodsModel,
+		g.defaultPicture,
+		ogf.id AS xmlId,
+		ogf.`status`,
+		ogf.id AS orderGoodsFileId
+	FROM
+		orderInfo oi,
+		goods g,
+		order_goods_file ogf
+	WHERE
+		oi.orderId = #{orderId, jdbcType=VARCHAR}
+	AND oi.goodsId = g.id
+	AND ogf.goodsId = g.id
+	AND ogf.orderId = #{orderId, jdbcType=VARCHAR}
+  </select>
+<!--   <select id="selectByOrderId" parameterType="com.penghai.store.order.model.OrderInfo" resultType="java.util.Map">
+  	select orderId, goodsId, goodsNumber, goodsPrice,
+  	(SELECT goodName FROM goods WHERE id=goodsId) as goodsName,
+  	(SELECT goodModel FROM goods WHERE id=goodsId) as goodsModel,
+  	(SELECT defaultPicture FROM goods WHERE id=goodsId) as defaultPicture
+  	from orderInfo
+  	where orderId = #{orderId, jdbcType=VARCHAR}
+  </select> -->
+</mapper>

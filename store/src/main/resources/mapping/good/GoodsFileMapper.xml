@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.good.dao.mybatis.GoodsFileMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.good.model.GoodsFile" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="goodId" property="goodId" jdbcType="INTEGER" />
+    <result column="fileName" property="fileName" jdbcType="VARCHAR" />
+    <result column="fileUrl" property="fileUrl" jdbcType="VARCHAR" />
+    <result column="fileVersion" property="fileVersion" jdbcType="VARCHAR" />
+    <result column="addtime" property="addtime" jdbcType="TIMESTAMP" />
+    <result column="fileSize" property="fileSize" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goodId, fileName, fileUrl, fileVersion, addtime, fileSize
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_file
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods_file
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.good.model.GoodsFile" useGeneratedKeys="true" keyProperty="id" >
+    insert into goods_file (goodId, fileName, fileUrl, 
+      fileVersion, addtime, fileSize
+      )
+    values (#{goodId,jdbcType=INTEGER}, #{fileName,jdbcType=VARCHAR}, #{fileUrl,jdbcType=VARCHAR}, 
+      #{fileVersion,jdbcType=VARCHAR}, #{addtime,jdbcType=TIMESTAMP}, #{fileSize,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.good.model.GoodsFile" useGeneratedKeys="true" keyProperty="id" >
+    insert into goods_file
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodId != null" >
+        goodId,
+      </if>
+      <if test="fileName != null" >
+        fileName,
+      </if>
+      <if test="fileUrl != null" >
+        fileUrl,
+      </if>
+      <if test="fileVersion != null" >
+        fileVersion,
+      </if>
+      <if test="addtime != null" >
+        addtime,
+      </if>
+      <if test="fileSize != null" >
+        fileSize,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodId != null" >
+        #{goodId,jdbcType=INTEGER},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileUrl != null" >
+        #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="fileVersion != null" >
+        #{fileVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        #{addtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileSize != null" >
+        #{fileSize,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.good.model.GoodsFile" >
+    update goods_file
+    <set >
+      <if test="goodId != null" >
+        goodId = #{goodId,jdbcType=INTEGER},
+      </if>
+      <if test="fileName != null" >
+        fileName = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileUrl != null" >
+        fileUrl = #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="fileVersion != null" >
+        fileVersion = #{fileVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="addtime != null" >
+        addtime = #{addtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileSize != null" >
+        fileSize = #{fileSize,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.good.model.GoodsFile" >
+    update goods_file
+    set goodId = #{goodId,jdbcType=INTEGER},
+      fileName = #{fileName,jdbcType=VARCHAR},
+      fileUrl = #{fileUrl,jdbcType=VARCHAR},
+      fileVersion = #{fileVersion,jdbcType=VARCHAR},
+      addtime = #{addtime,jdbcType=TIMESTAMP},
+      fileSize = #{fileSize,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 根据商品ID获取文件列表 -->
+  <select id="getFileListByGoodsId" resultMap="BaseResultMap">
+  	SELECT
+		*
+	FROM
+		goods_file
+	WHERE
+		goodId = #{goodsId}
+  </select>
+  <!-- 插入文件列表 -->
+  <insert id="insertFileList" parameterType="com.penghai.store.good.model.GoodsFile">
+  	INSERT INTO goods_file (
+		goodId,
+		fileName,
+		fileUrl,
+		fileVersion,
+		addtime,
+		fileSize
+	)
+	VALUES
+	<foreach collection="list" item="item" index="index" separator=",">
+		(#{item.goodId,jdbcType=INTEGER}, 
+		#{item.fileName,jdbcType=VARCHAR}, 
+		#{item.fileUrl,jdbcType=VARCHAR}, 
+		#{item.fileVersion,jdbcType=VARCHAR}, 
+		#{item.addtime,jdbcType=TIMESTAMP},
+		#{item.fileSize,jdbcType=VARCHAR})
+	 </foreach>
+  </insert>
+  
+  <!-- 删除商品文件列表 -->
+  <select id="deleteFileList">
+  	DELETE
+	FROM
+		goods_file
+	WHERE
+		goodId = #{goodsId}
+  </select>
+</mapper>

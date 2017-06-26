@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.user.dao.mybatis.UserMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.user.model.User" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="nickname" property="nickname" jdbcType="VARCHAR" />
+    <result column="enterpriseName" property="enterpriseName" jdbcType="VARCHAR" />
+    <result column="enterpriseURL" property="enterpriseURL" jdbcType="VARCHAR" />
+    <result column="organizationCode" property="organizationCode" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="registrationTime" property="registrationTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="companyAddress" property="companyAddress" jdbcType="VARCHAR" />
+    <result column="companyEmail" property="companyEmail" jdbcType="VARCHAR" />
+    <result column="companyTel" property="companyTel" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, nickname, enterpriseName, enterpriseURL, organizationCode, address, tel, contacts, 
+    email, password, registrationTime, status, companyAddress, companyEmail, companyTel
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.user.model.User" useGeneratedKeys="true" keyProperty="id" >
+    insert into user (nickname, enterpriseName, enterpriseURL, 
+      organizationCode, address, tel, 
+      contacts, email, password, 
+      registrationTime, status, companyAddress, 
+      companyEmail, companyTel)
+    values (#{nickname,jdbcType=VARCHAR}, #{enterpriseName,jdbcType=VARCHAR}, #{enterpriseURL,jdbcType=VARCHAR}, 
+      #{organizationCode,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{tel,jdbcType=VARCHAR}, 
+      #{contacts,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{registrationTime,jdbcType=TIMESTAMP}, #{status,jdbcType=TINYINT}, #{companyAddress,jdbcType=VARCHAR}, 
+      #{companyEmail,jdbcType=VARCHAR}, #{companyTel,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.user.model.User" useGeneratedKeys="true" keyProperty="id" >
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="nickname != null" >
+        nickname,
+      </if>
+      <if test="enterpriseName != null" >
+        enterpriseName,
+      </if>
+      <if test="enterpriseURL != null" >
+        enterpriseURL,
+      </if>
+      <if test="organizationCode != null" >
+        organizationCode,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="tel != null" >
+        tel,
+      </if>
+      <if test="contacts != null" >
+        contacts,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="registrationTime != null" >
+        registrationTime,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="companyAddress != null" >
+        companyAddress,
+      </if>
+      <if test="companyEmail != null" >
+        companyEmail,
+      </if>
+      <if test="companyTel != null" >
+        companyTel,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="nickname != null" >
+        #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseName != null" >
+        #{enterpriseName,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseURL != null" >
+        #{enterpriseURL,jdbcType=VARCHAR},
+      </if>
+      <if test="organizationCode != null" >
+        #{organizationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="tel != null" >
+        #{tel,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="registrationTime != null" >
+        #{registrationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="companyAddress != null" >
+        #{companyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="companyEmail != null" >
+        #{companyEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="companyTel != null" >
+        #{companyTel,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.user.model.User" >
+    update user
+    <set >
+      <if test="nickname != null" >
+        nickname = #{nickname,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseName != null" >
+        enterpriseName = #{enterpriseName,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseURL != null" >
+        enterpriseURL = #{enterpriseURL,jdbcType=VARCHAR},
+      </if>
+      <if test="organizationCode != null" >
+        organizationCode = #{organizationCode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="tel != null" >
+        tel = #{tel,jdbcType=VARCHAR},
+      </if>
+      <if test="contacts != null" >
+        contacts = #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="registrationTime != null" >
+        registrationTime = #{registrationTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="companyAddress != null" >
+        companyAddress = #{companyAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="companyEmail != null" >
+        companyEmail = #{companyEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="companyTel != null" >
+        companyTel = #{companyTel,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.user.model.User" >
+    update user
+    set nickname = #{nickname,jdbcType=VARCHAR},
+      enterpriseName = #{enterpriseName,jdbcType=VARCHAR},
+      enterpriseURL = #{enterpriseURL,jdbcType=VARCHAR},
+      organizationCode = #{organizationCode,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      tel = #{tel,jdbcType=VARCHAR},
+      contacts = #{contacts,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      registrationTime = #{registrationTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=TINYINT},
+      companyAddress = #{companyAddress,jdbcType=VARCHAR},
+      companyEmail = #{companyEmail,jdbcType=VARCHAR},
+      companyTel = #{companyTel,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="checkAddUnique" resultType="java.lang.Integer" 
+  	parameterType="com.penghai.store.user.model.User">
+  	select count(1)
+  	from user where email = #{email,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="checkAuth" resultType="java.lang.Integer"
+  	parameterType="com.penghai.store.user.model.User">
+  	select count(1)
+  	from user 
+  	where email = #{email,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByCondition" resultMap="BaseResultMap"
+  	parameterType="com.penghai.store.user.model.User">
+  	select 
+  	id, nickname, enterpriseName, enterpriseURL, organizationCode, address, tel, contacts, 
+    email, password, registrationTime, status, companyAddress, companyEmail, companyTel
+    from user
+    where email=#{email}
+  </select>
+  <select id="selectCountByCondition" resultMap="BaseResultMap"
+  	parameterType="com.penghai.store.user.model.User">
+  	select count(1) 
+    from user
+    where 1=1
+  </select>
+  <update id="changePassword" parameterType="com.penghai.store.user.model.User">
+    update `user`
+    set 
+      password = #{password,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

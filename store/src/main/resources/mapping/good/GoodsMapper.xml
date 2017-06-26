@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.good.dao.mybatis.GoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.good.model.Goods" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="goodCate" property="goodCate" jdbcType="INTEGER" />
+    <result column="goodName" property="goodName" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="defaultPicture" property="defaultPicture" jdbcType="VARCHAR" />
+    <result column="goodModel" property="goodModel" jdbcType="VARCHAR" />
+    <result column="expiryDate" property="expiryDate" jdbcType="TIMESTAMP" />
+    <result column="isForSale" property="isForSale" jdbcType="BIT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="addTime" property="addTime" jdbcType="TIMESTAMP" />
+    <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goodCate, goodName, description, price, defaultPicture, goodModel, expiryDate, isForSale, status, 
+    addTime, updateTime
+  </sql>
+  <sql id="Base_Good_List" >
+    id, goodCate, goodCateName,goodName, description, price, defaultPicture, goodModel, expiryDate, isForSale, status, 
+    addTime, updateTime
+  </sql>
+  <!-- 根据分类代码查询该分类及子分类下的所有商品 -->
+  <select id="selectByGoodCateCode" resultMap="BaseResultMap" parameterType="string">
+    select 
+    	a.id,a.goodCate,a.goodName,a.description,a.price,a.status,a.defaultPicture
+    from goods as a 
+   
+    where a.goodCate in
+	(	select id from industry_category 
+		where categoryCode like CONCAT(#{catagoryCode,jdbcType=VARCHAR},'%')
+	) 	
+
+  </select>
+  <!-- 根据ID查询商品的文件名 -->
+  <select id="selectPictureNameById" resultType="string" parameterType="java.lang.Integer">
+  	select defaultPicture from goods
+  	where id=#{id , jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectAllList" resultType="java.util.Map">
+  	select 
+  		a.id,a.goodCate,b.`name` goodCateName,a.goodName,a.description,a.price,a.status,a.defaultPicture,a.goodModel,
+  		a.expiryDate,a.isForSale,a.status,a.addTime,a.updateTime
+  	from goods as a
+  	left join
+  		industry_category as b on a.goodCate=b.id
+  	where 1=1
+  	order by a.addTime DESC
+  	
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from goods
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.good.model.Goods" useGeneratedKeys="true" keyProperty="id" >
+    insert into goods (goodCate, goodName, description, 
+      price, defaultPicture, goodModel, expiryDate, 
+      isForSale, status, addTime, 
+      updateTime)
+    values (#{goodCate,jdbcType=INTEGER}, #{goodName,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, 
+      #{price,jdbcType=DECIMAL}, #{defaultPicture,jdbcType=VARCHAR}, #{goodModel,jdbcType=VARCHAR}, #{expiryDate,jdbcType=TIMESTAMP}, 
+      #{isForSale,jdbcType=BIT}, #{status,jdbcType=TINYINT}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.good.model.Goods" useGeneratedKeys="true" keyProperty="id" >
+    insert into goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodCate != null" >
+        goodCate,
+      </if>
+      <if test="goodName != null" >
+        goodName,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="defaultPicture != null" >
+        defaultPicture,
+      </if>
+      <if test="goodModel != null" >
+        goodModel,
+      </if>
+      <if test="expiryDate != null" >
+        expiryDate,
+      </if>
+      <if test="isForSale != null" >
+        isForSale,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="addTime != null" >
+        addTime,
+      </if>
+      <if test="updateTime != null" >
+        updateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodCate != null" >
+        #{goodCate,jdbcType=INTEGER},
+      </if>
+      <if test="goodName != null" >
+        #{goodName,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="defaultPicture != null" >
+        #{defaultPicture,jdbcType=VARCHAR},
+      </if>
+      <if test="goodModel != null" >
+        #{goodModel,jdbcType=VARCHAR},
+      </if>
+      <if test="expiryDate != null" >
+        #{expiryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isForSale != null" >
+        #{isForSale,jdbcType=BIT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="addTime != null" >
+        #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.good.model.Goods" >
+    update goods
+    <set >
+      <if test="goodCate != null" >
+        goodCate = #{goodCate,jdbcType=INTEGER},
+      </if>
+      <if test="goodName != null" >
+        goodName = #{goodName,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="defaultPicture != null" >
+        defaultPicture = #{defaultPicture,jdbcType=VARCHAR},
+      </if>
+      <if test="goodModel != null" >
+        goodModel = #{goodModel,jdbcType=VARCHAR},
+      </if>
+      <if test="expiryDate != null" >
+        expiryDate = #{expiryDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isForSale != null" >
+        isForSale = #{isForSale,jdbcType=BIT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="addTime != null" >
+        addTime = #{addTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        updateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.good.model.Goods" >
+    update goods
+    set goodCate = #{goodCate,jdbcType=INTEGER},
+      goodName = #{goodName,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DECIMAL},
+      defaultPicture = #{defaultPicture,jdbcType=VARCHAR},
+      goodModel = #{goodModel,jdbcType=VARCHAR},
+      expiryDate = #{expiryDate,jdbcType=TIMESTAMP},
+      isForSale = #{isForSale,jdbcType=BIT},
+      status = #{status,jdbcType=TINYINT},
+      addTime = #{addTime,jdbcType=TIMESTAMP},
+      updateTime = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 获取全部商品 -->
+  <select id="getGoodsAll" resultMap="BaseResultMap" parameterType="com.penghai.store.good.model.Goods">
+  	SELECT 
+    <include refid="Base_Column_List" />
+    FROM goods
+    WHERE `status` = 1
+    ORDER BY updateTime DESC
+  </select>
+  <!-- 检查商品名称存在性 -->
+  <select id="checkGoodsNameExist" resultType="int" parameterType="string">
+  	SELECT
+		count(1)
+	FROM
+		goods
+	WHERE
+		goodName = #{goodsName}
+	AND
+		`status` = 1
+  </select>
+  <!-- 商品上下架 -->
+  <update id="changeGoodsForSaleStatus" parameterType="map">
+  UPDATE goods
+	SET isForSale = #{status}
+	WHERE
+		id IN 
+	<foreach collection="goodsIsList" item="goodsId"
+        index="index" open="(" close=")" separator=",">
+        #{goodsId}
+    </foreach>
+  </update>
+  
+  <!-- 根据条件获取商品列表 -->
+  <select id="getGoodsListByCondition" resultMap="BaseResultMap" parameterType="com.penghai.store.good.model.Goods">
+  	SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		goods
+	WHERE
+		1 = 1
+	AND `status` = 1
+	<if test="goodCateName != null" >
+        AND goodCate IN (
+		SELECT
+			id
+		FROM
+			industry_category
+		WHERE
+			`name` LIKE #{goodCateName}
+		)
+    </if>
+	<if test="goodCate != null" >
+        AND goodCate = #{goodCate}
+    </if>
+    <if test="goodModel != null" >
+        AND goodModel LIKE #{goodModel}
+    </if>
+    <if test="goodName != null" >
+        AND goodName LIKE #{goodName}
+    </if>
+    <if test="pageSize != '0'.toString()" >
+        LIMIT #{pageIndex} , #{pageSize}
+    </if>
+  </select>
+  
+  <!-- 根据条件获取商品列表 -->
+  <select id="getGoodsByCondition" resultMap="BaseResultMap" parameterType="java.util.Map">
+  	SELECT
+  		a.id,a.goodCate,b.`name` goodCateName,a.goodName,a.description,a.price,a.status,a.defaultPicture,a.goodModel,
+  		a.expiryDate,a.isForSale,a.status,a.addTime,a.updateTime
+  	from goods as a
+  	left join
+  		industry_category as b on a.goodCate=b.id
+	WHERE
+		1 = 1
+	AND a.`status` = 1
+	<if test="goodCateName != null" >
+        AND goodCate IN (
+		SELECT
+			id
+		FROM
+			industry_category
+		WHERE
+			`name` LIKE #{goodCateName}
+		)
+    </if>
+	<if test="goodCate != null" >
+        AND goodCate = #{goodCate}
+    </if>
+    <if test="goodModel != null" >
+        AND goodModel LIKE #{goodModel}
+    </if>
+    <if test="goodName != null" >
+        AND goodName LIKE #{goodName}
+    </if>
+  </select>
+</mapper>

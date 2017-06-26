@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.penghai.store.category.dao.mybatis.InitDatasDaoI">
+
+	<select id="getNum" resultType="int">
+		select count(1) from count_hour
+	</select>
+	
+	<insert id="saveCategoryList" parameterType="com.penghai.store.category.model.Category">
+		INSERT INTO industry_category (
+			id,
+			parentId,
+			`level`,
+			`name`,
+			categoryCode,
+			description,
+			`status`
+		)
+		VALUES
+			(
+				#{category.id},
+				#{category.parentId},
+				#{category.level},
+				#{category.name},
+				#{category.categoryCode},
+				#{category.description},
+				#{category.status}
+			)
+	</insert>
+</mapper>

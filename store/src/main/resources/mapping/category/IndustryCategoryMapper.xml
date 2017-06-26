@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.category.dao.mybatis.IndustryCategoryMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.category.model.IndustryCategory" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="parentId" property="parentId" jdbcType="INTEGER" />
+    <result column="level" property="level" jdbcType="TINYINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="categoryCode" property="categoryCode" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, parentId, level, name, categoryCode, description, status
+  </sql>
+  
+  <!-- 根据层级查询级别数据 -->
+  <select id="selectByLevel" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from industry_category
+    where level = #{level,jdbcType=TINYINT}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from industry_category
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from industry_category
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.category.model.IndustryCategory" useGeneratedKeys="true" keyProperty="id" >
+    insert into industry_category (id, parentId, level, name, 
+      categoryCode, description, status
+      )
+    values (#{id,jdbcType=VARCHAR}, #{parentId,jdbcType=VARCHAR}, #{level,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
+      #{categoryCode,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.category.model.IndustryCategory" useGeneratedKeys="true" keyProperty="id" >
+    insert into industry_category
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="parentId != null" >
+        parentId,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="categoryCode != null" >
+        categoryCode,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="parentId != null" >
+        #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=TINYINT},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null" >
+        #{categoryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.category.model.IndustryCategory" >
+    update industry_category
+    <set >
+      <if test="parentId != null" >
+        parentId = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=TINYINT},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null" >
+        categoryCode = #{categoryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.category.model.IndustryCategory" >
+    update industry_category
+    set parentId = #{parentId,jdbcType=INTEGER},
+      level = #{level,jdbcType=TINYINT},
+      name = #{name,jdbcType=VARCHAR},
+      categoryCode = #{categoryCode,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      status = #{status,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 查询该分类的分类代码 -->
+  <select id="selectCatagoryCodeById" parameterType="Integer" resultType="String">
+  	SELECT
+		categoryCode
+	FROM
+		industry_category
+	WHERE
+		id = #{id,jdbcType = INTEGER}
+  </select>
+  
+  <!-- 检查分类名称是否重复 -->
+  <select id="checkCateNameExist" parameterType="string" resultType="int">
+  	SELECT
+		COUNT(1)
+	FROM
+		industry_category
+	WHERE
+		`name` = #{cateName}
+	AND `status` = '0'
+  </select>
+  
+  <!-- 检查主键是否重复,防止抛错 -->
+  <select id="checkCateIdExist" parameterType="string" resultType="int">
+  	SELECT
+		COUNT(1)
+	FROM
+		industry_category
+	WHERE
+		id = #{id}
+  </select>
+  <!-- 根据上级分类ID查询下级分类列表 -->
+  <select id="selectChildCateList"  parameterType="string" resultMap="BaseResultMap">
+  	SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		industry_category
+	WHERE
+		parentId = #{id}
+	AND `status` = 0
+  </select>
+  
+  <!-- 批量删除分类 -->
+  <update id="deleteCategorysByCateIdList">
+  	UPDATE industry_category
+	SET `status` = 1
+	WHERE
+		id IN
+	<foreach collection="cateIds" item="id"
+        index="index" open="(" close=")" separator=",">
+        #{id}
+    </foreach>
+  </update>
+  
+  <!-- 根据条件查询分类 -->
+  <select id="selectCategoryByCondition" resultMap="BaseResultMap" parameterType="com.penghai.store.category.model.IndustryCategory">
+  	SELECT
+		<include refid="Base_Column_List" />
+	FROM
+		industry_category
+	WHERE
+		1=1
+	<if test="name != null" >
+        AND
+		`name` LIKE #{name}
+    </if>
+	AND `status` = 0
+  </select>
+  
+  
+  
+</mapper>

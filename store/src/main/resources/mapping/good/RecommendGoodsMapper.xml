@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.good.dao.mybatis.RecommendGoodsMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.good.model.RecommendGoods" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="goodId" property="goodId" jdbcType="INTEGER" />
+    <result column="sort" property="sort" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goodId, sort
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from recommend_goods
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from recommend_goods
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.good.model.RecommendGoods" useGeneratedKeys="true" keyProperty="id" >
+    insert into recommend_goods (goodId, sort)
+    values (#{goodId,jdbcType=INTEGER}, #{sort,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.good.model.RecommendGoods" useGeneratedKeys="true" keyProperty="id" >
+    insert into recommend_goods
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="goodId != null" >
+        goodId,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="goodId != null" >
+        #{goodId,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.good.model.RecommendGoods" >
+    update recommend_goods
+    <set >
+      <if test="goodId != null" >
+        goodId = #{goodId,jdbcType=INTEGER},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.good.model.RecommendGoods" >
+    update recommend_goods
+    set goodId = #{goodId,jdbcType=INTEGER},
+      sort = #{sort,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 获取推荐商品列表 -->
+  <select id="getRecommendGoodsList" resultType="com.penghai.store.good.model.RecommendGoods">
+  	SELECT * FROM `recommend_goods` LIMIT 8 
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</mapper>

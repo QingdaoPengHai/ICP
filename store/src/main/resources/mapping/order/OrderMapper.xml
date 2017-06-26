@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.penghai.store.order.dao.mybatis.OrderMapper" >
+  <resultMap id="BaseResultMap" type="com.penghai.store.order.model.Order" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="orderCode" property="orderCode" jdbcType="VARCHAR" />
+    <result column="userId" property="userId" jdbcType="INTEGER" />
+    <result column="buyTime" property="buyTime" jdbcType="TIMESTAMP" />
+    <result column="totalPrice" property="totalPrice" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="isDelete" property="isDelete" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, orderCode, userId, buyTime, totalPrice, status,isDelete
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from `order`
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="getOrderListByEmail" resultMap="BaseResultMap">
+    select 
+    	torder.id,
+    	orderCode,
+    	userId,
+    	buyTime,
+    	totalPrice, 
+    	torder.status,
+    	isDelete
+    from 
+    	`order` torder,
+		`user` tuser
+    where 
+	    tuser.email = #{email,jdbcType=VARCHAR}
+		AND tuser.id = torder.userId 
+	order by buyTime desc 
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from `order`
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.penghai.store.order.model.Order" useGeneratedKeys="true" keyProperty="id" >
+    insert into `order` (orderCode, userId, buyTime, 
+      totalPrice, status,isDelete)
+    values (#{orderCode,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, #{buyTime,jdbcType=TIMESTAMP}, 
+      #{totalPrice,jdbcType=DECIMAL}, #{status,jdbcType=TINYINT}),#{isDelete,jdbcType=VARCHAR}
+  </insert>
+  <insert id="insertSelective" parameterType="com.penghai.store.order.model.Order" useGeneratedKeys="true" keyProperty="id" >
+    insert into `order`
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderCode != null" >
+        orderCode,
+      </if>
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="buyTime != null" >
+        buyTime,
+      </if>
+      <if test="totalPrice != null" >
+        totalPrice,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="isDelete != null" >
+        isDelete,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderCode != null" >
+        #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="buyTime != null" >
+        #{buyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalPrice != null" >
+        #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null" >
+        #{isDelete,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.penghai.store.order.model.Order" >
+    update `order`
+    <set >
+      <if test="orderCode != null" >
+        orderCode = #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        userId = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="buyTime != null" >
+        buyTime = #{buyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalPrice != null" >
+        totalPrice = #{totalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="isDelete != null" >
+        isDelete = #{isDelete,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.penghai.store.order.model.Order" >
+    update `order`
+    set orderCode = #{orderCode,jdbcType=VARCHAR},
+      userId = #{userId,jdbcType=INTEGER},
+      buyTime = #{buyTime,jdbcType=TIMESTAMP},
+      totalPrice = #{totalPrice,jdbcType=DECIMAL},
+      status = #{status,jdbcType=TINYINT},
+      isDelete = #{isDelete,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectByCondition" resultMap="BaseResultMap"
+  	parameterType="com.penghai.store.order.model.Order">
+  	select 
+  	id, orderCode, userId, buyTime, totalPrice, status,isDelete,
+  	(SELECT nickname FROM user WHERE id=userId) as userName
+  	from `order`
+  	where 1=1 
+  	<if test="orderCode != null and orderCode != ''" >
+      and orderCode like CONCAT(CONCAT('%', #{orderCode,jdbcType=VARCHAR}),'%') 
+    </if>
+    <if test="userId != null and userId != ''" >
+      and userId = #{userId,jdbcType=VARCHAR}
+    </if>
+    <if test="isDelete != null and isDelete != ''" >
+      and isDelete = #{isDelete,jdbcType=VARCHAR}
+    </if>
+    <if test="beginDate != null" >
+      and buyTime &gt;= #{beginDate,jdbcType=TIMESTAMP}
+    </if>
+    <if test="endDate != null" >
+      and buyTime &lt; #{endDate,jdbcType=TIMESTAMP}
+    </if>
+    <if test="lowPrice != null" >
+      and totalPrice &gt;= #{lowPrice,jdbcType=DECIMAL}
+    </if>
+    <if test="highPrice != null" >
+      and totalPrice &lt;= #{highPrice,jdbcType=DECIMAL}
+    </if>
+    order by buyTime DESC
+  </select>
+  <select id="selectCountByCondition" resultType="java.lang.Integer"
+  	parameterType="com.penghai.store.order.model.Order">
+  	select count(1)
+  	from `order`
+  	where 1=1 
+  	<if test="orderCode != null and orderCode != ''" >
+      and orderCode like CONCAT(CONCAT('%', #{orderCode,jdbcType=VARCHAR}),'%') 
+    </if>
+    <if test="userId != null and userId != ''" >
+      and userId = #{userId,jdbcType=VARCHAR}
+    </if>
+    <if test="isDelete != null and isDelete != ''" >
+      and isDelete = #{isDelete,jdbcType=VARCHAR}
+    </if>
+    <if test="beginDate != null" >
+      and buyTime &gt;= #{beginDate,jdbcType=TIMESTAMP}
+    </if>
+    <if test="endDate != null" >
+      and buyTime &lt; #{endDate,jdbcType=TIMESTAMP}
+    </if>
+    <if test="lowPrice != null" >
+      and totalPrice &gt;= #{lowPrice,jdbcType=DECIMAL}
+    </if>
+    <if test="highPrice != null" >
+      and totalPrice &lt;= #{highPrice,jdbcType=DECIMAL}
+    </if>
+  </select>
+</mapper>
