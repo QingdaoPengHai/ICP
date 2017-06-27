@@ -169,7 +169,6 @@ public class MongoUtil {
 			map.put("count", collection.count());
 			result.add(map);
 		}
-		releaseMongo();
 		return result;
 	}
 
