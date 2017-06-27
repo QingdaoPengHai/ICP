@@ -15,12 +15,12 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
 import com.penghai.css.storage.business.StorageBusinessI;
 import com.penghai.css.util.MongoUtil;
 
 /**
  * 存储模块业务类
+ * 
  * @author 徐超
  * @Date 2017年5月10日 上午9:48:41
  */
@@ -32,11 +32,13 @@ public class StorageBusinessImpl implements StorageBusinessI{
 	
 	/**
 	 * 将Josn数据转为可执行的sql
+	 * 
 	 * @author 徐超
 	 * @Date 2017年5月9日 下午3:23:20
 	 * @param json
 	 * @return
 	 * @throws Exception
+	 *             dsa
 	 */
 	@Override
 	public String transferJsonToSql(String json) throws Exception {
