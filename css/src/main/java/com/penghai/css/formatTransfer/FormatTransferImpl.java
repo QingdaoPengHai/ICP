@@ -1,14 +1,24 @@
 package com.penghai.css.formatTransfer;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+
 import com.alibaba.fastjson.JSONObject;
+import com.penghai.css.util.CommonData.CM_INFO_DATA;
+import com.penghai.css.util.CommonData.CM_LOGIN_DATA;
 
 /**
  * 格式转换实现类
  * @author 徐超
  * @Date 2017年6月27日 上午11:31:33
  */
+@Service
 public class FormatTransferImpl implements IFormatTransfer {
 
+	Logger log = Logger.getLogger(FormatTransferImpl.class);
 	/**
 	 * 用户登录接口的格式化方法
 	 * @author 徐超
@@ -18,9 +28,44 @@ public class FormatTransferImpl implements IFormatTransfer {
 	 */
 	public JSONObject transferUserLoginFormat(String jsonString){
 		JSONObject resultJson = new JSONObject();
-		
-		
-		return resultJson;
+		try {
+			if("".equals(jsonString) || null==jsonString){
+				resultJson.put("code", "2");
+				resultJson.put("message", CM_INFO_DATA.SYSTEM_ERROR);
+				resultJson.put("data", null);
+				return resultJson;
+			}else{
+				String jsonStringDecode = URLDecoder.decode(jsonString, "utf-8");
+				JSONObject json = new JSONObject();
+				json = JSONObject.parseObject(jsonStringDecode);
+				boolean loginResult = json.getBooleanValue("result");
+				if(loginResult){
+					//登陆成功
+					JSONObject userInfoJson = json.getJSONObject("userInfo");
+					JSONObject resultData = new JSONObject();
+					
+					resultData.put("userId", userInfoJson.getString("id"));
+					resultData.put("nickname", userInfoJson.getString("nickname"));
+					resultData.put("email", userInfoJson.getString("email"));
+					
+					resultJson.put("code", "0");
+					resultJson.put("message", CM_LOGIN_DATA.LOGIN_SUCCESS_INFO);
+					resultJson.put("data", resultData);
+				}else{
+					//登录失败
+					resultJson.put("code", "1");
+					resultJson.put("message", CM_LOGIN_DATA.LOGIN_ERROR_INFO);
+					resultJson.put("data", null);
+				}
+				return resultJson;
+			}
+		} catch (UnsupportedEncodingException e) {
+			log.error(CM_INFO_DATA.SYSTEM_ERROR, e);
+			resultJson.put("code", "2");
+			resultJson.put("message", "系统错误");
+			resultJson.put("data", null);
+			return resultJson;
+		}
 	}
 	
 }
