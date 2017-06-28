@@ -1,5 +1,6 @@
 package com.penghai.linker.dataAcquisition.business.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -8,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.quartz.DisallowConcurrentExecution;
@@ -362,27 +364,31 @@ public class DataAcquisitionJobFactoryImpl implements IDataAcquisitionJobFactory
 	public boolean publishJsonToMQ(String jsonString,String mqIP,String mqPort,String mqUserName,String mqPassword){
 		boolean result = false;
 		EhcacheUtil ehcacheUtil = EhcacheUtil.getInstance();
+		//将数据发布到MQ
+		ConnectionFactory factory = new ConnectionFactory();
+		// MQ的IP
+		factory.setHost(mqIP);
+		// MQ端口
+	    factory.setPort(Integer.parseInt(mqPort));
+	    // MQ用户名
+	    factory.setUsername(mqUserName);
+	    // MQ密码
+	    factory.setPassword(mqPassword);
+	    //新建MQ链接
+	    com.rabbitmq.client.Connection connection = null;
+	    //新建管道
+        Channel channel = null;
 		try {
-			//将数据发布到MQ
-			ConnectionFactory factory = new ConnectionFactory();
-			// MQ的IP
-			factory.setHost(mqIP);
-			// MQ端口
-		    factory.setPort(Integer.parseInt(mqPort));
-		    // MQ用户名
-		    factory.setUsername(mqUserName);
-		    // MQ密码
-		    factory.setPassword(mqPassword);
 		    //新建MQ链接
-		    com.rabbitmq.client.Connection connection = factory.newConnection();
+		    connection = factory.newConnection();
 		    //新建管道
-	        Channel channel = connection.createChannel();
+	        channel = connection.createChannel();
 	        //将要发布的字符串进行UTF-8编码
 	        String jsonEncode = URLEncoder.encode(jsonString,"utf-8");
 	        //进行发布
 	        channel.basicPublish(CM_CONFIG_PROPERTIES.EXCHANG_NAME, "", null, jsonEncode.getBytes());
-	        channel.close();
-	        connection.close();
+//	        channel.close();
+//	        connection.close();
 			result = true;
 			//将正确状态保存至缓存
             ehcacheUtil.put(CM_CONFIG_PROPERTIES.CSS_MQ_STATUS_CACHE_KEY, CM_MESSAGE_INFO.RESULT_SUCCESS_CODE);
@@ -393,6 +399,15 @@ public class DataAcquisitionJobFactoryImpl implements IDataAcquisitionJobFactory
 			//将错误状态保存至缓存
         	ehcacheUtil.put(CM_CONFIG_PROPERTIES.CSS_MQ_STATUS_CACHE_KEY, CM_MESSAGE_INFO.RESULT_ERROR_CODE);
 			return result;
+		} finally {
+			try {
+				if(channel!=null || connection!=null){
+					channel.close();
+					connection.close();
+				}
+			} catch (IOException | TimeoutException e) {
+				log.error(CM_INFO_DATA.SYSTEM_ERROR,e);
+			}
 		}
 	}
 	
