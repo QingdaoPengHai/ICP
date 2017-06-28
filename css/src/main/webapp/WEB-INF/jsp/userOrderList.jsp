@@ -184,6 +184,27 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	    </div>	
 	</div>
   </div>
+  
+  
+  <!-- 确认模态框  by xc-->
+<div class="modal fade" id="download-start-confirm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog dialog-width">
+		<div class="modal-content" style="margin-top:350px;">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h3>提示</h3>
+			</div>
+			<div class="modal-body body-padding">
+				即将开始下载和配置服务包<br>
+				配置完成后数据库集群会自动重启
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-default" data-dismiss="modal">取消</a>
+				<a href="#" class="btn btn-primary" id="confirmStart" data-dismiss="modal">确认</a>
+			</div>
+		</div>
+	</div>
+</div>
 </body>
 
 <script type="text/javascript">
@@ -209,18 +230,28 @@ function logout(){
 } 
 
 function downloadXml(xmlId){
-	$.ajax({
-		url : "<%=apath%>/goodsFile/getXmlInfo",
-		data: {"xmlId":xmlId},
-		type:"POST",
-		dataType:"json",
-		async : false,
-		success : function(json){
-			optTip2(json.message);
-			if(json.code=="1"){
-				window.location.href = "<%=apath%>/login/toUserOrderList";
+	$("#download-start-confirm").modal();
+	//点击确认按钮
+	$("#confirmStart").click(function() {
+		disabledBtn("confirmStart");
+		$.ajax({
+			url : "<%=apath%>/goodsFile/getXmlInfo",
+			data: {"xmlId":xmlId},
+			type:"POST",
+			dataType:"json",
+			async : false,
+			success : function(json){
+				$("#download-start-confirm").modal('hide');
+				optTip2(json.message);
+				if(json.code=="1"){
+					window.location.href = "<%=apath%>/login/toUserOrderList";
+				}
+			},
+			error : function(){
+				optTip(false);
+				unDisabledBtn("confirmStart");
 			}
-		}
+		});
 	});
 }
 </script>
