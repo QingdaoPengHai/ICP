@@ -17,6 +17,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.penghai.css.common.model.HttpSession;
@@ -400,7 +401,9 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 				targetDatabasesString = targetDatabasesString.replace("&", linkerId);
 				targetDatabasesString = targetDatabasesString.replace("#", "</targetDatabase>");
 				String dataBaseInfoJson = getDatabaseInfoJson(xmlOriginal,linkerId);
+				String targetDataBaseInfoJson = getTargetDatabaseInfoJson(xmlOriginal, linkerId);
 				resultJson.put("databaseInfoJson", dataBaseInfoJson);
+				resultJson.put("targetDatabaseInfoJson", targetDataBaseInfoJson);
 				resultJson.put("xmlTargetDatabase", "<targetDatabase" + targetDatabasesString);
 				return resultJson;
 			}
@@ -462,6 +465,32 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 		}
 		
 		return dataBaseInfoJsonArray.toJSONString();
+	}
+	/**
+	 * 获取linker对应targetdatabase实体json信息
+	 * @param xmlInfo xml文本信息
+	 * @param linkerId 
+	 * @return
+	 * @author 秦超
+	 */
+	public static String getTargetDatabaseInfoJson(String xmlInfo,String linkerId){
+		Schema schemaObject = new Schema();
+		XmlUtil resultBinder = new XmlUtil(Schema.class,CollectionWrapper.class);
+		schemaObject = resultBinder.fromXml(xmlInfo);
+		
+		List<TargetDatabase> targetDatabaseList = schemaObject.getTargetDatabases();
+		TargetDatabase returnTargetDatabase = new TargetDatabase();
+		
+		//根据linkerId查询对应的TargetDatabase
+		for(TargetDatabase targetDatabase:targetDatabaseList){
+			if(linkerId.equals(targetDatabase.getLinkerId())){
+				returnTargetDatabase = targetDatabase;
+			}
+		}
+		
+		String targetDatabaseString = JSON.toJSONString(returnTargetDatabase);
+		
+		return targetDatabaseString;
 	}
 	
 }
