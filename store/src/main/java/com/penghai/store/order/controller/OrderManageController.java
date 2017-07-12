@@ -82,6 +82,18 @@ public class OrderManageController extends BaseController {
 		return orderManageBusiness.getUserOrderXmlList(email,password);
 	}
 	/**
+	 * 根据用户ID获取订单列表
+	 * @author 徐超
+	 * @Date 2017年7月11日 下午4:01:11
+	 * @return
+	 */
+	@RequestMapping(value = "/getUserOrderListByUserId")
+	@ResponseBody
+	public String getUserOrderListByUserId(){
+		String userId = request.getParameter("userId");
+		return orderManageBusiness.getUserOrderListByUserId(userId);
+	}
+	/**
 	 * 获取用户指定xml详细信息--登陆
 	 * @author 徐超  changeBy 秦超
 	 * @Date 2017年4月28日 下午5:15:27

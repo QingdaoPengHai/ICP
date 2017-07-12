@@ -48,6 +48,8 @@ public class CommonData {
 		public static final String EDIT_SUCCESS = "编辑成功";
 		// 系统错误
 		public static final String SYSTEM_ERROR = "系统错误";
+		//获取成功
+		public static final String QUERY_SUCCESS = "获取成功";
 	}
 
 	/**

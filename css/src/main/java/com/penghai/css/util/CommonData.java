@@ -97,6 +97,9 @@ public class CommonData {
 	 * @Date 2017年4月27日 上午11:15:59
 	 */
 	public interface CM_CONFIG_PROPERTIES {
+		// 商店服务根地址
+		public static final String STORE_ROOT_URL = CommonUtils.getProperties("commonDataConfig.properties",
+				"storeRootUrl");
 		// 商品图片上传地址
 		public static final String GOODS_PICTURE_UPLOAD_URL = CommonUtils.getProperties("commonDataConfig.properties",
 				"goodsPictureUploadURL");
@@ -201,6 +204,8 @@ public class CommonData {
 		public static final String UPDATE_ORDER_STATUS = "/order/updateOrderStatus";
 		//订单列表
 		public static final String ORDER_XML_LIST = "/order/getUserOrderXmlList";
+		//订单列表BY userId
+		public static final String ORDER_LIST_BY_USERID = "/order/getUserOrderListByUserId";
 		//store用户登录验证
 		public static final String LOGIN_CHECKIN = "/login/checkLoginforCSS";
 	}

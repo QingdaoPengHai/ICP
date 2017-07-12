@@ -36,6 +36,21 @@
 		AND tuser.id = torder.userId 
 	order by buyTime desc 
   </select>
+  <!-- 根据用户ID获取用户订单列表 -->
+  <select id="getOrderListByUserId" resultMap="BaseResultMap">
+    select 
+    	torder.id,
+    	orderCode,
+    	userId,
+    	buyTime,
+    	totalPrice
+    from 
+    	`order` torder,
+		`user` tuser
+    where 
+	    tuser.id = #{userId,jdbcType=VARCHAR}
+	order by buyTime desc 
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from `order`
     where id = #{id,jdbcType=INTEGER}

@@ -17,4 +17,13 @@ public interface IFormatTransfer {
 	 * @return
 	 */
 	JSONObject transferUserLoginFormat(String jsonString);
+	
+	/**
+	 * 获取用户订单列表的格式化方法
+	 * @author 徐超
+	 * @Date 2017年7月11日 下午3:24:21
+	 * @param jsonString
+	 * @return
+	 */
+	JSONObject transferUserOrdersFormat(String jsonString);
 }

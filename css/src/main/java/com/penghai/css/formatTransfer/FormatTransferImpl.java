@@ -6,7 +6,9 @@ import java.net.URLDecoder;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.penghai.css.util.CommonData.CM_CONFIG_PROPERTIES;
 import com.penghai.css.util.CommonData.CM_INFO_DATA;
 import com.penghai.css.util.CommonData.CM_LOGIN_DATA;
 
@@ -66,6 +68,36 @@ public class FormatTransferImpl implements IFormatTransfer {
 			resultJson.put("data", null);
 			return resultJson;
 		}
+	}
+	
+	/**
+	 * 获取用户订单列表的格式化方法
+	 * @author 徐超
+	 * @Date 2017年7月11日 下午3:24:21
+	 * @param jsonString
+	 * @return
+	 */
+	public JSONObject transferUserOrdersFormat(String jsonString){
+		JSONObject resultJson = new JSONObject();
+		String jsonStringDecode = "";
+		try {
+			jsonStringDecode = URLDecoder.decode(jsonString, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		jsonStringDecode = jsonStringDecode.replace("@SERVERIP", CM_CONFIG_PROPERTIES.STORE_ROOT_URL);
+		
+		resultJson = JSONObject.parseObject(jsonStringDecode);
+		JSONArray orderListArray = resultJson.getJSONArray("orderList");
+		
+		JSONObject dataJson = new JSONObject();
+		dataJson.put("orders", orderListArray);
+		dataJson.put("count", resultJson.get("count"));
+		resultJson.remove("orderList");
+		resultJson.remove("count");
+		resultJson.put("data", dataJson);
+	
+		return resultJson;
 	}
 	
 }

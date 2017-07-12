@@ -58,5 +58,20 @@ public interface OrderMapper {
      */
     int selectCountByCondition(Order order);
 
+    /**
+     * 根据email获取用户订单列表
+     * @author 徐超
+     * @Date 2017年7月11日 下午4:12:29
+     * @param email
+     * @return
+     */
 	List<Order> getOrderListByEmail(String email);
+	/**
+	 * 根据用户ID获取用户订单列表
+	 * @author 徐超
+	 * @Date 2017年7月11日 下午4:12:44
+	 * @param userId
+	 * @return
+	 */
+	List<Order> getOrderListByUserId(String userId);
 }

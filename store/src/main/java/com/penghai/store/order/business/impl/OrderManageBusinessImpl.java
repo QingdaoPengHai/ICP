@@ -381,9 +381,101 @@ public class OrderManageBusinessImpl implements OrderManageBusiness{
 		} catch (Exception e) {
 			//系统错误
 			log.error(e.getMessage());
-			resultJson.put("result", 0);
+			resultJson.put("result", 2);
 			resultJson.put("message", CM_INFO_DATA.SYSTEM_ERROR);
 			resultJson.put("count", 0);
+			resultJson.put("orderList", null);
+//			return resultJson.toJSONString();
+		}
+		
+		String resultJsonString;
+		try {
+			resultJsonString = URLEncoder.encode(resultJson.toJSONString(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			resultJsonString = resultJson.toJSONString();
+			e.printStackTrace();
+		}
+		
+		return resultJsonString;
+	}
+	/**
+	 * 根据用户ID获取用户订单
+	 * @author 徐超
+	 * @Date 2017年7月11日 下午5:29:18
+	 * @param userId
+	 * @return
+	 * @see com.penghai.store.order.business.OrderManageBusiness#getUserOrderListByUserId(java.lang.String)
+	 */
+	@Override
+	public String getUserOrderListByUserId(String userId){
+		JSONObject resultJson  = new JSONObject();
+		try {
+			
+			JSONArray resultArray = new JSONArray();
+			List<Order> orderList = orderMapper.getOrderListByUserId(userId);
+			
+			// 解析订单数据
+			for (Order o : orderList) {
+				JSONObject orderObject = new JSONObject();
+				Integer id = o.getId();
+				String orderCode = o.getOrderCode();
+				String buyTime = o.getBuyTimeStr();
+				Integer userIdInt = o.getUserId();
+				BigDecimal totalPrice = o.getTotalPrice();
+				// 请求该订单下的所有商品
+				OrderInfo record = new OrderInfo();
+				record.setOrderId(id);
+				List<Map<String, Object>> goods = orderInfoMapper.selectByOrderId(record);
+				// 商品列表
+				JSONArray goodArray = new JSONArray();
+				for (Map<String, Object> good : goods) {
+					// 商品详情
+					JSONObject goodObject = new JSONObject();
+					goodObject.put("goodId", String.valueOf(good.get("goodsId")));
+					goodObject.put("goodName", good.get("goodsName"));
+					goodObject.put("goodCount", String.valueOf(good.get("goodsNumber")));
+					goodObject.put("goodPrice", String.valueOf(good.get("goodsPrice")));
+					String defaultPicture = String.valueOf(good.get("defaultPicture"));
+					defaultPicture = defaultPicture.replace("../..", "@SERVERIP");
+					goodObject.put("goodUrl", defaultPicture);
+					String status = String.valueOf(good.get("status"));
+					String statusName = "";
+					if("0".equals(status)){
+						statusName = "已下单";
+					}else if("1".equals(status)){
+						statusName = "已生成";
+					}else if("2".equals(status)){
+						statusName = "已下载";
+					}else{
+						statusName = "未知";
+					}
+					goodObject.put("status", statusName);
+					// 加入商品列表
+					goodArray.add(goodObject);
+				}
+				// 添加订单的详情
+				orderObject.put("id", String.valueOf(id));
+				orderObject.put("orderCode", orderCode);
+				orderObject.put("orderDateTime", buyTime);
+				orderObject.put("totalPrice", String.valueOf(totalPrice));
+				orderObject.put("userId", String.valueOf(userIdInt));
+				orderObject.put("goods", goodArray);
+				// 将订单加入订单列表
+				resultArray.add(orderObject);
+			}
+			
+			
+			resultJson.put("code", "0");
+			resultJson.put("message", CM_INFO_DATA.QUERY_SUCCESS);
+			resultJson.put("count", String.valueOf(resultArray.size()));
+			resultJson.put("orderList", resultArray);
+			
+		} catch (Exception e) {
+			//系统错误
+			log.error(e.getMessage());
+			resultJson.put("code", "2");
+			resultJson.put("message", CM_INFO_DATA.SYSTEM_ERROR);
+			resultJson.put("count", "0");
 			resultJson.put("orderList", null);
 //			return resultJson.toJSONString();
 		}

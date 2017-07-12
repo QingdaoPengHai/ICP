@@ -29,4 +29,13 @@ public interface OrderManageBusiness {
 	 * @time 2017年5月11日
 	 */
 	public String updateOrderStatus(String email, String password, String xmlId);
+	
+	/**
+	 * 根据用户ID获取用户订单列表
+	 * @author 徐超
+	 * @Date 2017年7月11日 下午4:03:14
+	 * @param userId
+	 * @return
+	 */
+	String getUserOrderListByUserId(String userId);
 }
