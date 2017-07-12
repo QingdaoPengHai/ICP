@@ -8,13 +8,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.penghai.css.management.business.DataCountBusiness;
 import com.penghai.css.management.dao.mybatis.DataCountDaoI;
 import com.penghai.css.management.model.databaseModel.Database;
@@ -209,5 +213,60 @@ public class DataCountBusinessImpl implements DataCountBusiness{
         }
 		
         return buffer.toString();
+	}
+	
+	/**
+	 * 基于mongoDB的获取数据库信息
+	 * @author 徐超
+	 * @Date 2017年7月12日 下午4:00:56
+	 * @return
+	 */
+	@Override
+	public JSONObject getDatabaseInfo(){
+		//定义返回的Json对象
+		JSONObject resultJson = new JSONObject();
+		try {
+			JSONArray dataArray  = new JSONArray();
+			//通过最新的xml文件获取数据库列表
+			String databaseList = getDatabaseList();
+			//将数据库列表转为数组
+			JSONArray databaseArray = JSON.parseArray(databaseList);
+			//遍历数据库数组
+			for(int i=0;i<databaseArray.size();i++){
+				//返回数据中的节点
+				JSONArray tableCount = new JSONArray();
+				JSONObject dataJson = new JSONObject();
+				JSONObject databaseJson = databaseArray.getJSONObject(i);
+				//获取数据库名称
+				String databaseName = databaseJson.getString("databaseName");
+				//获得MongoDB数据库对象
+				DB db = mongoUtil.getDataBases(databaseName);
+				//获取指定数据库的所有集合列表
+				Set<String> collectionSet = db.getCollectionNames();
+				//遍历集合列表
+				for(String collectionName:collectionSet){
+					JSONObject tableCountJson = new JSONObject();
+					//获取集合对象
+					DBCollection collection = mongoUtil.useCollection(db,collectionName);
+					//获取集合数据数量
+					long count = collection.count();
+					tableCountJson.put("tableName", collectionName);
+					tableCountJson.put("count", String.valueOf(count));
+					tableCount.add(tableCountJson);
+				}
+				dataJson.put("databaseName", databaseName);
+				dataJson.put("tableCount", tableCount);
+				dataArray.add(dataJson);
+			}
+			resultJson.put("code", "0");
+			resultJson.put("message", "获取成功");
+			resultJson.put("data", dataArray);
+		
+		} catch (Exception e) {
+			resultJson.put("code", "2");
+			resultJson.put("message", "获取失败，发生未知错误");
+			resultJson.put("data", null);
+		}
+		return resultJson;
 	}
 }

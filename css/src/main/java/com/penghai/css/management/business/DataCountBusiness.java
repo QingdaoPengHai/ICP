@@ -1,4 +1,7 @@
 package com.penghai.css.management.business;
+
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * 
  * @author 秦超
@@ -21,4 +24,11 @@ public interface DataCountBusiness {
 	 */
 	String getDatabaseDataCount();
 
+	/**
+	 * 基于mongoDB的获取数据库信息
+	 * @author 徐超
+	 * @Date 2017年7月12日 下午4:00:56
+	 * @return
+	 */
+	JSONObject getDatabaseInfo();
 }
