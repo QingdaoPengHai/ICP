@@ -22,6 +22,24 @@
     from linker
     where 1=1
   </select>
+  
+   <select id="selectAllLinkersMobile" resultType="map">
+  	SELECT
+		linkerId,
+		linkerIPAddress,
+		registerTime AS registerDataTime,
+		CASE linkerStatus
+	WHEN '1' THEN
+		'已注册'
+	ELSE
+		'未注册'
+	END AS linkerStatus
+	FROM
+		linker
+	WHERE
+		1 = 1
+  </select>
+  
   <select id="selectLinkerReportsbyLinkerId" resultType="com.penghai.css.management.model.LinkerReport">
   	select linkerId,reportErrorType,reportErrorDetail,reportErrorTime
     from linker_report

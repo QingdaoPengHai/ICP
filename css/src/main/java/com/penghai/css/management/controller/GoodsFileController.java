@@ -20,7 +20,7 @@ import com.penghai.css.management.business.GoodsFileBusiness;
  */
 @Controller
 @RequestMapping(value="/goodsFile")
-public class GoodsFileController extends BaseController{
+public class GoodsFileController{
 	@Autowired
 	private GoodsFileBusiness goodsFileBusiness;
 	

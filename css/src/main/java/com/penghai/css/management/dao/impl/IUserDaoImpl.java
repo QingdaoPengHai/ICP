@@ -2,6 +2,7 @@ package com.penghai.css.management.dao.impl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,15 @@ public class IUserDaoImpl implements CM_INFO_DATA{
 	 */
 	public List<Linker> getLinkerInfo() {
 		List<Linker> linkerInfo = linkerMapper.selectAllLinkers();
+		return linkerInfo;
+	}
+	/**
+	 * 获取linker信息--mobile
+	 * @author 徐超
+	 * @return
+	 */
+	public List<LinkedHashMap<String,Object>> getLinkerInfoMobile() {
+		List<LinkedHashMap<String,Object>> linkerInfo = linkerMapper.selectAllLinkersMobile();
 		return linkerInfo;
 	}
 	/**

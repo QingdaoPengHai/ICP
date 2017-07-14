@@ -433,7 +433,7 @@ public class OrderManageBusinessImpl implements OrderManageBusiness{
 					JSONObject goodObject = new JSONObject();
 					goodObject.put("goodId", String.valueOf(good.get("goodsId")));
 					goodObject.put("goodName", good.get("goodsName"));
-					goodObject.put("goodCount", String.valueOf(good.get("goodsNumber")));
+					goodObject.put("goodNumber", String.valueOf(good.get("goodsNumber")));
 					goodObject.put("goodPrice", String.valueOf(good.get("goodsPrice")));
 					String defaultPicture = String.valueOf(good.get("defaultPicture"));
 					defaultPicture = defaultPicture.replace("../..", "@SERVERIP");

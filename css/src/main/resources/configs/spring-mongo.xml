@@ -32,7 +32,7 @@
     -->
     <!-- 测试mongoClient -->
 	<bean id="mongoClient" class="com.mongodb.MongoClient">
-		<constructor-arg name="host" value="10.10.8.161"/>
+		<constructor-arg name="host" value="10.10.10.130"/>
 		<constructor-arg name="port" value="27017"/>
 	</bean>
   	

@@ -1,5 +1,6 @@
 package com.penghai.css.management.dao.mybatis;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.penghai.css.management.model.Linker;
@@ -25,6 +26,13 @@ public interface LinkerMapper {
      * @return Linker List
      */
     List<Linker> selectAllLinkers();      
+    
+    /**
+     * 查询所有linker
+     * @author 徐超
+     * @return Linker List
+     */
+    List<LinkedHashMap<String,Object>> selectAllLinkersMobile();
     
     /**
      * 更新linker

@@ -68,8 +68,10 @@ public class GoodsFileBusinessImpl implements GoodsFileBusiness{
 		String getXmlInfoUrl = CM_CONFIG_PROPERTIES.STORE_SERVER_URL + CM_STORE_SERVER_FUNCTION.ORDER_XML_DETAIL;
 		String updateStatusUrl = CM_CONFIG_PROPERTIES.STORE_SERVER_URL + CM_STORE_SERVER_FUNCTION.UPDATE_ORDER_STATUS;
 		
-		String email = session.get("email");
-		String password = session.get("password");
+//		String email = session.get("email");
+//		String password = session.get("password");
+		String email = "qc@qq.com";
+		String password = "123123";
 		
 		String xmlInfoResult = "";
 		String updateStatusResult = "";

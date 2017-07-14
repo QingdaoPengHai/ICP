@@ -30,7 +30,7 @@
 	    </property>
 	</bean>
 	<aop:aspectj-autoproxy proxy-target-class="true"/>
-	<import resource="spring-quartz.xml"/>
+	<!-- <import resource="spring-quartz.xml"/> -->
 	<import resource="spring-redis.xml"/>
 	<import resource="spring-dao.xml"/>
 	<import resource="spring-mongo.xml"/>
