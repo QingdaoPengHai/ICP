@@ -52,6 +52,7 @@ public class LinkerManagerBusinessImpl implements LinkerManagerBusiness{
 		
 		Linker linkerQuery = null;
 		JSONObject resultJson = new JSONObject();
+		String targetDatabaseInfoJson = "";
 		String databaseInfoJson = "";
 		String xmlTargetDatabase = "";
 		String resultMapEncode = "";	
@@ -83,6 +84,7 @@ public class LinkerManagerBusinessImpl implements LinkerManagerBusiness{
 		}else{
 			JSONObject xmlDatabasesJson = goodsFileBusiness.getDatabaseAndTargetDatabaseInfoFromXml(linkerId);
 			
+			targetDatabaseInfoJson = xmlDatabasesJson.getString("targetDatabaseInfoJson");
 			xmlTargetDatabase = xmlDatabasesJson.getString("xmlTargetDatabase");
 			databaseInfoJson = xmlDatabasesJson.getString("databaseInfoJson");
 			//解析xml文件失败
@@ -115,6 +117,7 @@ public class LinkerManagerBusinessImpl implements LinkerManagerBusiness{
 				}
 				
 				//设置返回值
+				resultJson.put("targetDatabaseInfoJson", targetDatabaseInfoJson);
 				resultJson.put("databaseInfoJson", databaseInfoJson);
 				resultJson.put("targetDatabaseXml", xmlTargetDatabase);
 				resultJson.put("code", CM_LINKER_RETURN_CODE.LINKER_RETURN_OK);	
